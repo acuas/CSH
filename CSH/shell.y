@@ -48,7 +48,7 @@ command: simple_command
 simple_command:	
 	command_and_args iomodifier_opt NEWLINE {
 		printf("   Yacc: Execute command\n");
-		//(*_currentCommand->execute)(_currentCommand);
+		execute(_currentCommand);
 	}
 	| NEWLINE {
 	}
@@ -58,9 +58,7 @@ simple_command:
 command_and_args:
 	command_word arg_list {
 		printf("	Yacc: insert simple command\n");
-		//printf("%d %d", _currentCommand->_numberOfAvailableSimpleCommands, _currentCommand->_numberOfSimpleCommands);
-		//(*_currentCommand->
-		//	insertSimpleCommand)(_currentCommand, _currentSimpleCommand );
+		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}
 	;
 
@@ -71,19 +69,19 @@ arg_list:
 
 argument:
 	WORD {
-			printf("AICi");
-            printf("   Yacc: insert argument \"%s\"\n", $1);
-	       (*_currentSimpleCommand->insertArgument)(_currentSimpleCommand, $1 );
+		printf("AICi");
+        printf("   Yacc: insert argument \"%s\"\n", $1);
+		insertArgument(_currentSimpleCommand, $1 );
 	}
 	;
 
 command_word:
 	WORD {
-				printf("%s\n", $1);
-               printf("   Yacc: insert command \"%s\"\n", $1);
-			free(_currentSimpleCommand);
-			_currentSimpleCommand = newSimpleCommand();
-	       (*_currentSimpleCommand->insertArgument)(_currentSimpleCommand, $1 );
+		printf("%s\n", $1);
+        printf("   Yacc: insert command \"%s\"\n", $1);
+		free(_currentSimpleCommand);
+		_currentSimpleCommand = newSimpleCommand();
+	    insertArgument(_currentSimpleCommand, $1 );
 	}
 	;
 

@@ -10,8 +10,6 @@ struct SimpleCommand {
 	// Number of arguments
 	int _numberOfArguments;
 	char ** _arguments;
-	
-	void (*insertArgument) (struct SimpleCommand *, char *);
 };
 
 void insertArgument(struct SimpleCommand *, char * argument);
@@ -25,13 +23,6 @@ struct Command {
 	char * _inputFile;
 	char * _errFile;
 	int _background;
-
-	void (*prompt) ();
-	void (*print) (struct Command *);
-	void (*execute) (struct Command *);
-	void (*clear) (struct Command *);
-	void (*insertSimpleCommand) (struct Command *, struct SimpleCommand *);
-
 };
 
 // Static variables 
@@ -42,7 +33,7 @@ void prompt();
 void print(struct Command *_tmp);
 void execute(struct Command *_tmp);
 void clear(struct Command *_tmp);
-void insertSimpleCommand( struct Command *_tmp, struct SimpleCommand * simpleCommand );
+void insertSimpleCommand(struct Command *,struct SimpleCommand * simpleCommand );
 struct Command *newCommand();
 
 #endif

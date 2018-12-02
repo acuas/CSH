@@ -8,19 +8,21 @@
 
 #include "command.h"
 
-#define InitNoOfArguments 5
+#define noOfChars 50
 
 struct SimpleCommand *newSimpleCommand() {
     struct SimpleCommand *_tmp = (struct SimpleCommand *) malloc(sizeof(struct SimpleCommand));
     _tmp->_numberOfAvailableArguments = 5;
     _tmp->_numberOfArguments = 0;
     _tmp->_arguments = (char **) malloc(_tmp->_numberOfAvailableArguments * sizeof(char *));
-    _tmp->insertArgument = &insertArgument;
+    int i;
+    for (i = 0; i < _tmp->_numberOfAvailableArguments; ++i) {
+        _tmp->_arguments[i] = (char *) malloc(noOfChars * sizeof(char));
+    }
     return _tmp;
 }
 
 void insertArgument(struct SimpleCommand *_tmp, char * argument ){
-    printf("%d %d", _tmp->_numberOfArguments, _tmp->_numberOfAvailableArguments);
 	if ( _tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments  + 1 ) {
 		// Double the available space
 		_tmp->_numberOfAvailableArguments *= 2;
@@ -30,6 +32,10 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ){
         if (_moreArguments != NULL) {
             // Succes reallocating memory
             _tmp->_arguments = _moreArguments;
+            int i;
+            for (i = _tmp->_numberOfAvailableArguments / 2; i < _tmp->_numberOfAvailableArguments; ++i) {
+                _tmp->_arguments[i] = (char *) malloc(noOfChars * sizeof(char));
+            }
         }
         else {
             // Error reallocating memory
@@ -45,7 +51,6 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ){
 	_tmp->_arguments[ _tmp->_numberOfArguments + 1] = NULL;
 	
 	_tmp->_numberOfArguments++;
-    printf("Am reusit sa ies.\n");
 }
 
 struct Command *newCommand() {
@@ -54,13 +59,8 @@ struct Command *newCommand() {
     _tmp->_numberOfAvailableSimpleCommands = 5;
     _tmp->_numberOfSimpleCommands = 0;
 	_tmp->_simpleCommands = (struct SimpleCommand **)
-		malloc( -_tmp->_numberOfSimpleCommands * sizeof( struct SimpleCommand * ) );
+		malloc( _tmp->_numberOfAvailableSimpleCommands * sizeof( struct SimpleCommand * ) );
 
-    _tmp->prompt = &prompt;
-    _tmp->print = &print;
-    _tmp->execute = &execute;
-    _tmp->clear = &clear;
-    _tmp->insertSimpleCommand = &insertSimpleCommand;
 	_tmp->_numberOfSimpleCommands = 0;
 	_tmp->_outFile = 0;
 	_tmp->_inputFile = 0;
@@ -69,10 +69,9 @@ struct Command *newCommand() {
     return _tmp;
 }
 
-void insertSimpleCommand( struct Command *_tmp, struct SimpleCommand * simpleCommand ) {
-    printf("0, 0");
-    //printf("%d %d", _tmp->_numberOfAvailableSimpleCommands, _tmp->_numberOfSimpleCommands);
-    /*if ( _tmp->_numberOfAvailableSimpleCommands == _tmp->_numberOfSimpleCommands ) {
+void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleCommand ) {
+    printf("%d %d", _tmp->_numberOfAvailableSimpleCommands, _tmp->_numberOfSimpleCommands);
+    if ( _tmp->_numberOfAvailableSimpleCommands == _tmp->_numberOfSimpleCommands ) {
 		_tmp->_numberOfAvailableSimpleCommands *= 2;
         struct SimpleCommand **moreSimpleCommand = (struct SimpleCommand **) realloc( _tmp->_simpleCommands,
 			 _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand * ) );
@@ -90,7 +89,6 @@ void insertSimpleCommand( struct Command *_tmp, struct SimpleCommand * simpleCom
 	
 	_tmp->_simpleCommands[ _tmp->_numberOfSimpleCommands ] = simpleCommand;
 	_tmp->_numberOfSimpleCommands++;
-    */
 }
 
 void clear(struct Command *_tmp)
@@ -149,15 +147,14 @@ void print(struct Command *_tmp)
 
 void execute(struct Command *_tmp)
 {
-    printf("Number of Simple Commands %d", _tmp->_numberOfSimpleCommands);
 	// Don't do anything if there are no simple commands
 	if ( _tmp->_numberOfSimpleCommands == 0 ) {
-		(*_tmp->prompt)();
+		prompt();
 		return;
 	}
 
 	// Print contents of Command data structure
-	(*_tmp->print)(_tmp);
+	print(_tmp);
 
 	// Add execution here
 	// For every simple command fork a new process
@@ -165,10 +162,11 @@ void execute(struct Command *_tmp)
 	// and call exec
 
 	// Clear to prepare for next command
-	/*(*_tmp->clear)(_tmp);
-	// Print new prompt
-	(*_tmp->prompt)();
-    */
+	clear(_tmp);
+	// Print new prompt and allocate memory for _currentCommand
+	free(_currentCommand);
+    _currentCommand = newCommand();
+    prompt();
 }
 
 void prompt()
@@ -182,7 +180,7 @@ int yyparse(void);
 int main() {
     _currentCommand = newCommand();
     //_currentCommand->_simpleCommands = newSimpleCommand();
-    (*_currentCommand->prompt)();
+    prompt();
     yyparse();
     return 0;
 }
