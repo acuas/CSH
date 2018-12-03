@@ -77,12 +77,12 @@ void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleComm
 			 _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand * ) );
         if (moreSimpleCommand != NULL) {
             // Succes reallocating memory
-            _tmp->_simpleCommands = moreSimpleCommand;
+            //_tmp->_simpleCommands = moreSimpleCommand;
         }
         else {
             // Error reallocating memory
-            free(_tmp->_simpleCommands);
             printf("Error reallocating memory.\n");
+            free(_tmp->_simpleCommands);
             exit (1);
         }
 	}

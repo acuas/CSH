@@ -1,7 +1,7 @@
 %{
 
 #include <string.h>
-#include "y.tab.h"
+#include "shell.tab.h"
 
 %}
 
