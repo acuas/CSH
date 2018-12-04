@@ -5,6 +5,9 @@
 #include <sys/wait.h>
 #include <string.h>
 #include <signal.h>
+#include <sys/syscall.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 #include "command.h"
 
@@ -142,6 +145,91 @@ void execute()
 	// For every simple command fork a new process
 	// Setup i/o redirection
 	// and call exec
+
+	// save IN/OUT
+
+	int tmpin = dup(0);
+	int tmpout = dup(1);
+
+	// Set the initial Input
+	int fdin;
+	if(_currentCommand->_inputFile) {
+		fdin = open(_currentCommand->_inputFile, O_RDONLY);
+	}
+	else{
+		// Use default input
+		fdin = dup(tmpin);
+	}
+
+	pid_t pid;
+	int fdout, i;
+	for(i = 0; i < _currentCommand->_numberOfSimpleCommands; i++){
+		//redirect inout
+		dup2(fdin, 0);
+		close(fdin);
+
+		//setup output
+		if( i == _currentCommand->_numberOfSimpleCommands - 1){
+			// Last simple command
+			if(_currentCommand->_outFile){
+				fdout = open(_currentCommand->_outFile, O_WRONLY);
+			}
+			else{
+				// Use default output
+				fdout = dup(tmpout);
+			}
+		}
+
+		else{
+			// Not last simple command create pipe
+
+			int fdpipe[2];
+			pipe(fdpipe);
+			fdin = fdpipe[0];
+			fdout = fdpipe[1];
+		}
+
+		// Redirect output
+
+		dup2(fdout, 1);
+		close(fdout);
+
+		// Create child process
+
+		pid = fork();
+		if(pid < 0){
+			perror(NULL);
+			return;
+		}
+		else if(pid ==0){
+			int j = 0;
+			char ** argv;
+			for(j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfArguments; j++){
+			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[j]);
+				argv[j] =  _currentCommand->_simpleCommands[i]->_arguments[j];
+			}
+			
+			
+			execvp(_currentCommand->_simpleCommands[i]->_arguments[0], argv);
+			perror(NULL);
+			_exit(1);
+		}
+		else{
+			wait(NULL);
+		}
+	}
+
+	// Restore in/out defaults
+
+	dup2(tmpin, 0);
+	dup2(tmpout,1);
+	close(tmpin);
+	close(tmpout);
+	int status;
+	waitpid(pid, &status, WNOHANG);
+	/*if(!(_currentCommand->_background)){
+		waitpid(pid, &status, WNOHANG);
+	}*/
 
 	// Clear to prepare for next command
 	//_currentCommand = clear(_tmp);
