@@ -17,7 +17,7 @@ struct SimpleCommand *newSimpleCommand() {
     _tmp->_arguments = (char **) malloc(_tmp->_numberOfAvailableArguments * sizeof(char *));
     int i;
     for (i = 0; i < _tmp->_numberOfAvailableArguments; ++i) {
-        _tmp->_arguments[i] = (char *) malloc(noOfChars * sizeof(char));
+        _tmp->_arguments[i] = (char *) calloc(noOfChars, sizeof(char));
     }
     return _tmp;
 }
@@ -34,7 +34,7 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ){
             _tmp->_arguments = _moreArguments;
             int i;
             for (i = _tmp->_numberOfAvailableArguments / 2; i < _tmp->_numberOfAvailableArguments; ++i) {
-                _tmp->_arguments[i] = (char *) malloc(noOfChars * sizeof(char));
+                _tmp->_arguments[i] = (char *) calloc(noOfChars , sizeof(char));
             }
         }
         else {
@@ -44,13 +44,9 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ){
             exit (1);
         }
 	}
+	strcpy(_tmp->_arguments[_tmp->_numberOfArguments], argument);
 	
-	_tmp->_arguments[ _tmp->_numberOfArguments ] = argument;
-
-	// Add NULL argument at the end
-	_tmp->_arguments[ _tmp->_numberOfArguments + 1] = NULL;
-	
-	_tmp->_numberOfArguments++;
+	_currentSimpleCommand->_numberOfArguments++;
 }
 
 struct Command *newCommand() {
@@ -61,16 +57,15 @@ struct Command *newCommand() {
 	_tmp->_simpleCommands = (struct SimpleCommand **)
 		malloc( _tmp->_numberOfAvailableSimpleCommands * sizeof( struct SimpleCommand * ) );
 
-	_tmp->_numberOfSimpleCommands = 0;
-	_tmp->_outFile = 0;
-	_tmp->_inputFile = 0;
-	_tmp->_errFile = 0;
+	_tmp->_outFile = NULL;
+	_tmp->_inputFile = NULL;
+	_tmp->_errFile = NULL;
 	_tmp->_background = 0;
     return _tmp;
 }
 
 void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleCommand ) {
-    printf("%d %d", _tmp->_numberOfAvailableSimpleCommands, _tmp->_numberOfSimpleCommands);
+    //printf("%d %d", _tmp->_numberOfAvailableSimpleCommands, _tmp->_numberOfSimpleCommands);
     if ( _tmp->_numberOfAvailableSimpleCommands == _tmp->_numberOfSimpleCommands ) {
 		_tmp->_numberOfAvailableSimpleCommands *= 2;
         struct SimpleCommand **moreSimpleCommand = (struct SimpleCommand **) realloc( _tmp->_simpleCommands,
@@ -91,34 +86,19 @@ void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleComm
 	_tmp->_numberOfSimpleCommands++;
 }
 
-void clear(struct Command *_tmp)
+void clear()
 {
-	for ( int i = 0; i < _tmp->_numberOfSimpleCommands; i++ ) {
-		for ( int j = 0; j < _tmp->_simpleCommands[ i ]->_numberOfArguments; j ++ ) {
-			free ( _tmp->_simpleCommands[ i ]->_arguments[ j ] );
-		}
-		
-		free ( _tmp->_simpleCommands[ i ]->_arguments );
-		free ( _tmp->_simpleCommands[ i ] );
+	int i, j;
+	for (i = 0; i < _currentCommand -> _numberOfSimpleCommands; ++i) {
+			for (j = 0; j < _currentCommand -> _simpleCommands[i] -> _numberOfAvailableArguments; ++j) {
+				//printf("%s ", _currentCommand-> _simpleCommands[i] -> _arguments[j]);
+				if (_currentCommand -> _simpleCommands[i] -> _arguments[j] != NULL)
+					free(_currentCommand -> _simpleCommands[i] -> _arguments[j]);
+			}
+			free(_currentCommand -> _simpleCommands[i] -> _arguments);
+			free(_currentCommand -> _simpleCommands[i]);
 	}
-
-	if ( _tmp->_outFile ) {
-		free( _tmp->_outFile );
-	}
-
-	if ( _tmp->_inputFile ) {
-		free( _tmp->_inputFile );
-	}
-
-	if ( _tmp->_errFile ) {
-		free( _tmp->_errFile );
-	}
-
-	_tmp->_numberOfSimpleCommands = 0;
-	_tmp->_outFile = 0;
-	_tmp->_inputFile = 0;
-	_tmp->_errFile = 0;
-	_tmp->_background = 0;
+	free(_currentCommand);
 }
 void print(struct Command *_tmp)
 {
@@ -145,16 +125,18 @@ void print(struct Command *_tmp)
 	
 }
 
-void execute(struct Command *_tmp)
+void execute()
 {
+	// Add NULL argument at the end
+	_currentSimpleCommand->_arguments[ _currentSimpleCommand->_numberOfArguments + 1] = NULL;
 	// Don't do anything if there are no simple commands
-	if ( _tmp->_numberOfSimpleCommands == 0 ) {
+	if ( _currentCommand->_numberOfSimpleCommands == 0 ) {
 		prompt();
 		return;
 	}
 
 	// Print contents of Command data structure
-	print(_tmp);
+	print(_currentCommand);
 
 	// Add execution here
 	// For every simple command fork a new process
@@ -162,10 +144,11 @@ void execute(struct Command *_tmp)
 	// and call exec
 
 	// Clear to prepare for next command
-	clear(_tmp);
+	//_currentCommand = clear(_tmp);
 	// Print new prompt and allocate memory for _currentCommand
-	free(_currentCommand);
-    _currentCommand = newCommand();
+	
+	clear();
+	_currentCommand = newCommand();
     prompt();
 }
 
@@ -179,7 +162,6 @@ int yyparse(void);
 
 int main() {
     _currentCommand = newCommand();
-    //_currentCommand->_simpleCommands = newSimpleCommand();
     prompt();
     yyparse();
     return 0;
