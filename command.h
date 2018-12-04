@@ -31,8 +31,8 @@ struct SimpleCommand *_currentSimpleCommand;
 
 void prompt();
 void print(struct Command *_tmp);
-void execute(struct Command *_tmp);
-void clear(struct Command *_tmp);
+void execute();
+void clear();
 void insertSimpleCommand(struct Command *,struct SimpleCommand * simpleCommand );
 struct Command *newCommand();
 
