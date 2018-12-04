@@ -55,7 +55,7 @@ simple_command:
 	}
 	| NEWLINE {
 	}
-	| error NEWLINE { yyerrok; }
+	| error NEWLINE { yyerrok; prompt(); }
 	;
 
 command_and_args:
