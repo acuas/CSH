@@ -1,0 +1,13 @@
+total 162
+drwxrwxrwx 1 john john  4096 Dec  5 21:29 .
+drwxrwxrwx 1 john john  4096 Dec  4 08:44 ..
+-rwxrwxrwx 1 john john  7331 Dec  5 21:30 command.c
+-rwxrwxrwx 1 john john   863 Dec  4 20:12 command.h
+drwxrwxrwx 1 john john  4096 Dec  4 21:11 .git
+-rwxrwxrwx 1 john john 44722 Dec  5 21:22 lex.yy.c
+-rwxrwxrwx 1 john john 33368 Dec  5 21:29 shell
+-rwxrwxrwx 1 john john   365 Dec  5 21:22 shell.l
+-rwxrwxrwx 1 john john  1452 Dec  4 19:29 shell.y
+-rwxrwxrwx 1 john john   600 Dec  5 21:29 text.txt
+-rwxrwxrwx 1 john john 45378 Dec  5 21:22 y.tab.c
+-rwxrwxrwx 1 john john  2312 Dec  5 21:22 y.tab.h

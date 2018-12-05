@@ -371,9 +371,9 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    1,    1,    1,    4,    5,    1,    5,    5,    5,
-        5,    5,    5,    5,    5,    5,    5,    1,    1,    1,
-        1,    6,    1,    1,    4,    4,    4,    4,    4,    4,
+        1,    1,    1,    1,    4,    4,    5,    6,    6,    6,
+        6,    6,    6,    6,    6,    6,    6,    1,    1,    1,
+        1,    7,    1,    1,    4,    4,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
         4,    4,    4,    4,    4,    4,    4,    4,    4,    4,
         1,    1,    1,    1,    1,    1,    4,    4,    4,    4,
@@ -397,15 +397,15 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1
     } ;
 
-static const YY_CHAR yy_meta[7] =
+static const YY_CHAR yy_meta[8] =
     {   0,
-        1,    1,    1,    2,    2,    1
+        1,    1,    1,    2,    1,    2,    1
     } ;
 
 static const flex_int16_t yy_base[12] =
     {   0,
-        0,    0,    8,    9,    9,    9,    0,    9,    0,    9,
-        5
+        0,    0,    9,   10,   10,   10,    0,   10,    0,   10,
+        6
     } ;
 
 static const flex_int16_t yy_def[12] =
@@ -414,16 +414,16 @@ static const flex_int16_t yy_def[12] =
        10
     } ;
 
-static const flex_int16_t yy_nxt[16] =
+static const flex_int16_t yy_nxt[18] =
     {   0,
-        4,    5,    6,    7,    4,    8,    9,   10,    3,   10,
-       10,   10,   10,   10,   10
+        4,    5,    6,    7,    7,    4,    8,    9,   10,    3,
+       10,   10,   10,   10,   10,   10,   10
     } ;
 
-static const flex_int16_t yy_chk[16] =
+static const flex_int16_t yy_chk[18] =
     {   0,
-        1,    1,    1,    1,    1,    1,   11,    3,   10,   10,
-       10,   10,   10,   10,   10
+        1,    1,    1,    1,    1,    1,    1,   11,    3,   10,
+       10,   10,   10,   10,   10,   10,   10
     } ;
 
 static yy_state_type yy_last_accepting_state;
@@ -444,7 +444,7 @@ char *yytext;
 #line 2 "shell.l"
 
 #include <string.h>
-#include "shell.tab.h"
+#include "y.tab.h"
 
 #line 450 "lex.yy.c"
 #line 451 "lex.yy.c"
@@ -700,7 +700,7 @@ yy_match:
 			yy_current_state = yy_nxt[yy_base[yy_current_state] + yy_c];
 			++yy_cp;
 			}
-		while ( yy_base[yy_current_state] != 9 );
+		while ( yy_base[yy_current_state] != 10 );
 
 yy_find_action:
 		yy_act = yy_accept[yy_current_state];

@@ -29,7 +29,7 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ){
 	if ( _tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments  + 1 ) {
 		// Double the available space
 		_tmp->_numberOfAvailableArguments *= 2;
-        
+
         char **_moreArguments = (char **) realloc( _tmp->_arguments,
 				_tmp->_numberOfAvailableArguments * sizeof( char * ) );
         if (_moreArguments != NULL) {
@@ -172,7 +172,7 @@ void execute()
 		if( i == _currentCommand->_numberOfSimpleCommands - 1){
 			// Last simple command
 			if(_currentCommand->_outFile){
-				fdout = open(_currentCommand->_outFile, O_WRONLY);
+				fdout = open(_currentCommand->_outFile, O_WRONLY | O_CREAT);
 			}
 			else{
 				// Use default output
@@ -203,16 +203,24 @@ void execute()
 		}
 		else if(pid ==0){
 			int j = 0;
-			char ** argv;
+			char ** argv = (char**)malloc(_currentCommand->_simpleCommands[i]->_numberOfArguments * (sizeof(char*)));
 			for(j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfArguments; j++){
 			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[j]);
 				argv[j] =  _currentCommand->_simpleCommands[i]->_arguments[j];
 			}
+			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[0]);
+		
+			if(strcmp(_currentCommand->_simpleCommands[i]->_arguments[0], "cd") == 0){
+				chdir(argv[1]);
+
+				//printf("%s\n", argv[1]);
+			}
+			else{
+				execvp(_currentCommand->_simpleCommands[i]->_arguments[0], argv);
+				perror(NULL);
+				_exit(1);
+			}
 			
-			
-			execvp(_currentCommand->_simpleCommands[i]->_arguments[0], argv);
-			perror(NULL);
-			_exit(1);
 		}
 		else{
 			wait(NULL);
@@ -226,7 +234,7 @@ void execute()
 	close(tmpin);
 	close(tmpout);
 	int status;
-	waitpid(pid, &status, WNOHANG);
+	//waitpid(pid, &status, WNOHANG);
 	/*if(!(_currentCommand->_background)){
 		waitpid(pid, &status, WNOHANG);
 	}*/
