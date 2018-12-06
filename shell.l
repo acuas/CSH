@@ -19,6 +19,10 @@
 		return GREAT;
 	}
 
+"<" 	{
+		return LESS;
+	}
+
 	
 "|" 	{
 		return PIPE;

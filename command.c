@@ -149,9 +149,9 @@ void execute()
 
 	// save IN/OUT/ERR
 
-	int tmpin = dup(0);
-	int tmpout = dup(1);
-	int tmperr = dup(2);
+	int tmpin = dup(STDIN_FILENO);
+	int tmpout = dup(STDOUT_FILENO);
+	int tmperr = dup(STDERR_FILENO);
 
 	// Set the initial Input
 	int fdin;
@@ -164,7 +164,7 @@ void execute()
 	}
 
 	pid_t pid;
-	int fdout, i, fderr;
+	int fdout, fderr, i;
 	for(i = 0; i < _currentCommand->_numberOfSimpleCommands; i++){
 		//redirect in out err
 		dup2(fdin, 0);
@@ -175,19 +175,20 @@ void execute()
 		if( i == _currentCommand->_numberOfSimpleCommands - 1){
 			// Last simple command
 			if(_currentCommand->_outFile){
-				fdout = open(_currentCommand->_outFile, O_WRONLY | O_CREAT);
+				fdout = open(_currentCommand->_outFile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
 			}
 			else{
 				// Use default output
 				fdout = dup(tmpout);
 			}
-
+			
 			if(_currentCommand->_errFile){
-				fderr = open(_currentCommand->_errFile, O_WRONLY | O_CREAT);
+				fderr = open(_currentCommand->_errFile, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
 			}
 			else{
 				fderr = dup(tmperr);
 			}
+			
 		}
 
 		else{
@@ -200,8 +201,8 @@ void execute()
 
 		// Redirect output
 
-		dup2(fdout, 1);
-		dup2(fderr, 2);
+		dup2(fdout, STDOUT_FILENO);
+		dup2(fderr, STDERR_FILENO);
 		close(fdout);
 		close(fderr);
 
@@ -243,9 +244,9 @@ void execute()
 
 	// Restore in/out defaults
 
-	dup2(tmpin, 0);
-	dup2(tmpout,1);
-	dup2(tmperr, 2);
+	dup2(tmpin, STDIN_FILENO);
+	dup2(tmpout, STDOUT_FILENO);
+	dup2(tmperr, STDERR_FILENO);
 	close(tmpin);
 	close(tmpout);
 	close(tmperr);
