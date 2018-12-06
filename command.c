@@ -101,6 +101,8 @@ void clear()
 			free(_currentCommand -> _simpleCommands[i] -> _arguments);
 			free(_currentCommand -> _simpleCommands[i]);
 	}
+
+	//free(_currentSimpleCommand);
 	free(_currentCommand);
 }
 void print(struct Command *_tmp)
@@ -130,8 +132,7 @@ void print(struct Command *_tmp)
 
 void execute()
 {
-	// Add NULL argument at the end
-	_currentSimpleCommand->_arguments[ _currentSimpleCommand->_numberOfArguments + 1] = NULL;
+
 	// Don't do anything if there are no simple commands
 	if ( _currentCommand->_numberOfSimpleCommands == 0 ) {
 		prompt();
@@ -182,7 +183,6 @@ void execute()
 
 		else{
 			// Not last simple command create pipe
-
 			int fdpipe[2];
 			pipe(fdpipe);
 			fdin = fdpipe[0];
@@ -203,11 +203,13 @@ void execute()
 		}
 		else if(pid ==0){
 			int j = 0;
-			char ** argv = (char**)malloc(_currentCommand->_simpleCommands[i]->_numberOfArguments * (sizeof(char*)));
+			char ** argv = (char **) malloc((_currentCommand->_simpleCommands[i]->_numberOfArguments + 1)* (sizeof(char*)));
+			// printf("Numarul de argumente este %d\n", _currentCommand->_simpleCommands[i]->_numberOfArguments);
 			for(j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfArguments; j++){
-			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[j]);
 				argv[j] =  _currentCommand->_simpleCommands[i]->_arguments[j];
 			}
+			// Add NULL argument at the end
+			argv[_currentCommand->_simpleCommands[i]->_numberOfArguments] = NULL;
 			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[0]);
 		
 			if(strcmp(_currentCommand->_simpleCommands[i]->_arguments[0], "cd") == 0){
@@ -220,7 +222,6 @@ void execute()
 				perror(NULL);
 				_exit(1);
 			}
-			
 		}
 		else{
 			wait(NULL);

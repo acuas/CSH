@@ -7,7 +7,7 @@
 
 %token	<string_val> WORD
 
-%token 	NOTOKEN GREAT NEWLINE 
+%token 	NOTOKEN GREAT NEWLINE PIPE
 
 %union	{
 	char *string_val;
@@ -59,15 +59,15 @@ simple_command:
 	;
 
 command_and_args:
-	command_word arg_list {
+	command_word arg_list pipe {
 		//printf("	Yacc: insert simple command\n");
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}
 	;
 
 arg_list:
-	arg_list argument
-	| /* empty */
+	arg_list argument 
+	|
 	;
 
 argument:
@@ -76,6 +76,7 @@ argument:
         //printf("   Yacc: insert argument \"%s\"\n", $1);
 		insertArgument(_currentSimpleCommand, $1 );
 	}
+
 	;
 
 command_word:
@@ -93,7 +94,29 @@ iomodifier_opt:
 		//strcpy(_currentCommand -> _outFile, $2);
 		_currentCommand->_outFile = $2;
 	}
-	| /* empty */ 
+	|
+	;
+
+pipe: 
+	PIPE command_and_args_for_pipe {
+		// printf("Am intrat pe pipe");
+		//insertSimpleCommand( _currentCommand, _currentSimpleCommand );
+	}
+	| 
+	;
+
+command_and_args_for_pipe: 
+	command_word_for_pipe arg_list pipe {
+		
+	}
+	;
+
+command_word_for_pipe: 
+	WORD {
+		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
+		_currentSimpleCommand = newSimpleCommand();
+	    insertArgument(_currentSimpleCommand, $1 );
+	}
 	;
 
 %%
