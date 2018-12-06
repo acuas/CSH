@@ -147,10 +147,11 @@ void execute()
 	// Setup i/o redirection
 	// and call exec
 
-	// save IN/OUT
+	// save IN/OUT/ERR
 
 	int tmpin = dup(0);
 	int tmpout = dup(1);
+	int tmperr = dup(2);
 
 	// Set the initial Input
 	int fdin;
@@ -163,10 +164,11 @@ void execute()
 	}
 
 	pid_t pid;
-	int fdout, i;
+	int fdout, i, fderr;
 	for(i = 0; i < _currentCommand->_numberOfSimpleCommands; i++){
-		//redirect inout
+		//redirect in out err
 		dup2(fdin, 0);
+		
 		close(fdin);
 
 		//setup output
@@ -178,6 +180,13 @@ void execute()
 			else{
 				// Use default output
 				fdout = dup(tmpout);
+			}
+
+			if(_currentCommand->_errFile){
+				fderr = open(_currentCommand->_errFile, O_WRONLY | O_CREAT);
+			}
+			else{
+				fderr = dup(tmperr);
 			}
 		}
 
@@ -192,7 +201,9 @@ void execute()
 		// Redirect output
 
 		dup2(fdout, 1);
+		dup2(fderr, 2);
 		close(fdout);
+		close(fderr);
 
 		// Create child process
 
@@ -224,21 +235,20 @@ void execute()
 			}
 		}
 		else{
-			wait(NULL);
+			
+				wait(NULL);
 		}
+		
 	}
 
 	// Restore in/out defaults
 
 	dup2(tmpin, 0);
 	dup2(tmpout,1);
+	dup2(tmperr, 2);
 	close(tmpin);
 	close(tmpout);
-	int status;
-	//waitpid(pid, &status, WNOHANG);
-	/*if(!(_currentCommand->_background)){
-		waitpid(pid, &status, WNOHANG);
-	}*/
+	close(tmperr);
 
 	// Clear to prepare for next command
 	//_currentCommand = clear(_tmp);
