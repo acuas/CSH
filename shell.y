@@ -48,7 +48,7 @@ command: simple_command
         ;
 
 simple_command:	
-	command_and_args NEWLINE {
+	command_and_args iomodifier_opt NEWLINE {
 		//printf("   Yacc: Execute command\n");
 		execute();
 		
@@ -60,7 +60,7 @@ simple_command:
 	;
 
 command_and_args:
-	command_word arg_list iomodifier_opt pipe {
+	command_word arg_list pipe {
 		//printf("	Yacc: insert simple command\n");
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}

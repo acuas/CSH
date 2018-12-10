@@ -8,7 +8,8 @@
 #include <sys/syscall.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-
+#include <readline/readline.h>
+#include <readline/history.h>
 #include "command.h"
 
 #define noOfChars 50
@@ -26,7 +27,7 @@ struct SimpleCommand *newSimpleCommand() {
 }
 
 void insertArgument(struct SimpleCommand *_tmp, char * argument ){
-	if ( _tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments  + 1 ) {
+	if ( _tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments) {
 		// Double the available space
 		_tmp->_numberOfAvailableArguments *= 2;
 
@@ -41,6 +42,7 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ){
             }
         }
         else {
+			/// Should we really free just _tmp->_arguments ???
             // Error reallocating memory
             free(_tmp->_arguments);
             printf("Error reallocating memory");
@@ -78,6 +80,7 @@ void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleComm
             //_tmp->_simpleCommands = moreSimpleCommand;
         }
         else {
+			/// Should we really free just _tmp->_simpleCommands ?
             // Error reallocating memory
             printf("Error reallocating memory.\n");
             free(_tmp->_simpleCommands);
@@ -101,7 +104,7 @@ void clear()
 			free(_currentCommand -> _simpleCommands[i] -> _arguments);
 			free(_currentCommand -> _simpleCommands[i]);
 	}
-
+	///Why no free for in/out/errFile?
 	//free(_currentSimpleCommand);
 	free(_currentCommand);
 }
@@ -118,6 +121,7 @@ void print(struct Command *_tmp)
 		for ( int j = 0; j < _tmp->_simpleCommands[i]->_numberOfArguments; j++ ) {
 			printf("\"%s\" \t", _tmp->_simpleCommands[i]->_arguments[ j ] );
 		}
+		printf("\n");
 	}
 
 	printf( "\n\n" );
@@ -193,6 +197,7 @@ void execute()
 
 		else{
 			// Not last simple command create pipe
+			/// fdpipe shouldn't be declared here
 			int fdpipe[2];
 			pipe(fdpipe);
 			fdin = fdpipe[0];
@@ -213,7 +218,7 @@ void execute()
 			perror(NULL);
 			return;
 		}
-		else if(pid ==0){
+		else if(pid == 0) {
 			int j = 0;
 			char ** argv = (char **) malloc((_currentCommand->_simpleCommands[i]->_numberOfArguments + 1)* (sizeof(char*)));
 			// printf("Numarul de argumente este %d\n", _currentCommand->_simpleCommands[i]->_numberOfArguments);
@@ -269,6 +274,7 @@ void prompt()
 int yyparse(void);
 
 int main() {
+	rl_bind_key('\t', rl_complete);
     _currentCommand = newCommand();
     prompt();
     yyparse();
