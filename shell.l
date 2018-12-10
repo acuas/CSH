@@ -28,6 +28,12 @@
 		return PIPE;
 	}
 
+">>" 	{
+		return GREATGREAT;
+	}
+"2>"    {
+		return ERR;
+	}
 
 [\./a-zA-Z\-][\./a-zA-Z0-9\-]*  {
 		/* Assume that file names only have alpha chars */

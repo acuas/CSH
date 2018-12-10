@@ -13,6 +13,16 @@
 
 #define noOfChars 50
 
+char *userName;
+char *machineName;
+
+void getTheRightUser(){
+	userName = (char*)malloc(4096*sizeof(char));
+    machineName = (char*)malloc(4096*sizeof(char));
+	getlogin_r(userName, 4096);	// the userName
+	gethostname(machineName, 4096); // the MachineName
+}
+
 struct SimpleCommand *newSimpleCommand() {
     struct SimpleCommand *_tmp = (struct SimpleCommand *) malloc(sizeof(struct SimpleCommand));
     _tmp->_numberOfAvailableArguments = 5;
@@ -134,6 +144,7 @@ void execute()
 {
 
 	// Don't do anything if there are no simple commands
+
 	if ( _currentCommand->_numberOfSimpleCommands == 0 ) {
 		prompt();
 		return;
@@ -262,7 +273,8 @@ void execute()
 
 void prompt()
 {
-	printf("myshell>");
+	getTheRightUser();
+	printf("%s@%s: ", userName, machineName);
 	fflush(stdout);
 }
 

@@ -36,4 +36,9 @@ void clear();
 void insertSimpleCommand(struct Command *,struct SimpleCommand * simpleCommand );
 struct Command *newCommand();
 
+void getTheRightUser();
+extern char *userName;
+extern char *machineName;
+
+
 #endif
