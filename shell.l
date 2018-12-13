@@ -15,6 +15,14 @@
 		/* Discard Spaces and Tabs */
     }	
 
+"\e[A"	{
+		return UP_ARROW;
+}
+
+"\e[B"	{
+		return DOWN_ARROW;
+}
+
 ">" 	{
 		return GREAT;
 	}
