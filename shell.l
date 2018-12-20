@@ -35,10 +35,6 @@
 		return LESSLESS;
 	}
 
-"2>>"	{
-		return ERRERR;
-	}
-
 "|" 	{
 		return PIPE;
 	}

@@ -53,8 +53,7 @@ extern int yydebug;
     NEWLINE = 263,
     PIPE = 264,
     GREATGREAT = 265,
-    LESSLESS = 266,
-    ERRERR = 267
+    LESSLESS = 266
   };
 #endif
 /* Tokens.  */
@@ -67,7 +66,6 @@ extern int yydebug;
 #define PIPE 264
 #define GREATGREAT 265
 #define LESSLESS 266
-#define ERRERR 267
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -78,7 +76,7 @@ union YYSTYPE
 
 	char *string_val;
 
-#line 82 "y.tab.h" /* yacc.c:1909  */
+#line 80 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

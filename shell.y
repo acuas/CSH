@@ -7,7 +7,7 @@
 
 %token	<string_val> WORD
 
-%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS ERRERR
+%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS
 
 %union	{
 	char *string_val;
@@ -49,7 +49,6 @@ command: simple_command
 
 simple_command:	
 	command_and_args iomodifier_opt NEWLINE {
-		//printf("   Yacc: Execute command\n");
 		execute();
 		
 	}
@@ -61,7 +60,6 @@ simple_command:
 
 command_and_args:
 	command_word arg_list pipe {
-		//printf("	Yacc: insert simple command\n");
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}
 	;
@@ -73,8 +71,6 @@ arg_list:
 
 argument:
 	WORD {
-		//printf("AICi");
-        //printf("   Yacc: insert argument \"%s\"\n", $1);
 		insertArgument(_currentSimpleCommand, $1 );
 	}
 
@@ -82,8 +78,6 @@ argument:
 
 command_word:
 	WORD {
-		//printf("%s\n", $1);
-        //printf("   Yacc: insert command \"%s\"\n", $1);
 		_currentSimpleCommand = newSimpleCommand();
 	    insertArgument(_currentSimpleCommand, $1 );
 	}
@@ -104,9 +98,6 @@ iomodifier_opt:
 	}
 	| LESSLESS WORD {
 		_currentCommand->_inputMatchWord = $2;
-	}
-	| ERRERR WORD {
-		_currentCommand->_doubleErrFile = $2;
 	}
 	| 
 	;
