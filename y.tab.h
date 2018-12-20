@@ -49,8 +49,12 @@ extern int yydebug;
     NOTOKEN = 259,
     GREAT = 260,
     LESS = 261,
-    NEWLINE = 262,
-    PIPE = 263
+    ERR = 262,
+    NEWLINE = 263,
+    PIPE = 264,
+    GREATGREAT = 265,
+    LESSLESS = 266,
+    ERRERR = 267
   };
 #endif
 /* Tokens.  */
@@ -58,8 +62,12 @@ extern int yydebug;
 #define NOTOKEN 259
 #define GREAT 260
 #define LESS 261
-#define NEWLINE 262
-#define PIPE 263
+#define ERR 262
+#define NEWLINE 263
+#define PIPE 264
+#define GREATGREAT 265
+#define LESSLESS 266
+#define ERRERR 267
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -70,7 +78,7 @@ union YYSTYPE
 
 	char *string_val;
 
-#line 74 "y.tab.h" /* yacc.c:1909  */
+#line 82 "y.tab.h" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;

@@ -23,16 +23,24 @@
 		return LESS;
 	}
 
-	
-"|" 	{
-		return PIPE;
+"2>"    {
+		return ERR;
 	}
 
 ">>" 	{
 		return GREATGREAT;
 	}
-"2>"    {
-		return ERR;
+
+"<<"	{
+		return LESSLESS;
+	}
+
+"2>>"	{
+		return ERRERR;
+	}
+
+"|" 	{
+		return PIPE;
 	}
 
 [\./a-zA-Z\-][\./a-zA-Z0-9\-]*  {

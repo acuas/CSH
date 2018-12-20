@@ -17,8 +17,8 @@ char *userName;
 char *machineName;
 
 void getTheRightUser(){
-	userName = (char*)malloc(4096*sizeof(char));
-    machineName = (char*)malloc(4096*sizeof(char));
+	userName = (char *)malloc(4096 * sizeof(char));
+    machineName = (char *)malloc(4096 * sizeof(char));
 	getlogin_r(userName, 4096);	// the userName
 	gethostname(machineName, 4096); // the MachineName
 }
@@ -73,6 +73,9 @@ struct Command *newCommand() {
 	_tmp->_outFile = NULL;
 	_tmp->_inputFile = NULL;
 	_tmp->_errFile = NULL;
+	_tmp->_appendOutputFile = NULL;
+	_tmp->_inputMatchWord = NULL;
+	_tmp->_doubleErrFile = NULL;
 	_tmp->_background = 0;
     return _tmp;
 }

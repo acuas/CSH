@@ -7,7 +7,7 @@
 
 %token	<string_val> WORD
 
-%token 	NOTOKEN GREAT LESS NEWLINE PIPE
+%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS ERRERR
 
 %union	{
 	char *string_val;
@@ -91,27 +91,36 @@ command_word:
 
 iomodifier_opt:
 	GREAT WORD {
-		//printf("   Yacc: insert output \"%s\"\n", $2);
-		//strcpy(_currentCommand -> _outFile, $2);
 		_currentCommand->_outFile = $2;
 	}
 	| LESS WORD {
 		_currentCommand->_inputFile = $2;
 	}
-	|
+	| ERR WORD {
+		_currentCommand->_errFile = $2;
+	}
+	| GREATGREAT WORD {
+		_currentCommand->_appendOutputFile = $2;
+	}
+	| LESSLESS WORD {
+		_currentCommand->_inputMatchWord = $2;
+	}
+	| ERRERR WORD {
+		_currentCommand->_doubleErrFile = $2;
+	}
+	| 
 	;
 
 pipe: 
 	PIPE command_and_args_for_pipe {
-		// printf("Am intrat pe pipe");
-		//insertSimpleCommand( _currentCommand, _currentSimpleCommand );
+		// Nothing done yet;
 	}
 	| 
 	;
 
 command_and_args_for_pipe: 
 	command_word_for_pipe arg_list pipe {
-		
+		// Nothing done yet;
 	}
 	;
 

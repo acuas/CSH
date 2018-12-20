@@ -22,6 +22,9 @@ struct Command {
 	char * _outFile;
 	char * _inputFile;
 	char * _errFile;
+	char * _appendOutputFile;
+	char * _inputMatchWord;
+	char * _doubleErrFile;
 	int _background;
 };
 
