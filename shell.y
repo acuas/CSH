@@ -1,10 +1,3 @@
-
-/*
- * This parser compiles the following grammar:
- *
- *	cmd [arg]* [> filename]
-  */
-
 %token	<string_val> WORD
 
 %token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS
@@ -71,15 +64,14 @@ arg_list:
 
 argument:
 	WORD {
-		insertArgument(_currentSimpleCommand, $1 );
+		insertArgument(_currentSimpleCommand, $1);
 	}
-
 	;
 
 command_word:
 	WORD {
 		_currentSimpleCommand = newSimpleCommand();
-	    insertArgument(_currentSimpleCommand, $1 );
+	    insertArgument(_currentSimpleCommand, $1);
 	}
 	;
 

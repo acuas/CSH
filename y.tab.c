@@ -125,7 +125,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 12 "shell.y" /* yacc.c:355  */
+#line 5 "shell.y" /* yacc.c:355  */
 
 	char *string_val;
 
@@ -145,7 +145,7 @@ int yyparse (void);
 #endif /* !YY_YY_Y_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
-#line 16 "shell.y" /* yacc.c:358  */
+#line 9 "shell.y" /* yacc.c:358  */
 
 extern int yylex();
 #define yylex yylex
@@ -462,9 +462,9 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    39,    39,    43,    44,    47,    51,    55,    58,    62,
-      68,    69,    73,    80,    87,    90,    93,    96,    99,   102,
-     106,   109,   113,   119
+       0,    32,    32,    36,    37,    40,    44,    48,    51,    55,
+      61,    62,    66,    72,    79,    82,    85,    88,    91,    94,
+      98,   101,   105,   111
 };
 #endif
 
@@ -1253,7 +1253,7 @@ yyreduce:
   switch (yyn)
     {
         case 6:
-#line 51 "shell.y" /* yacc.c:1646  */
+#line 44 "shell.y" /* yacc.c:1646  */
     {
 		execute();
 		
@@ -1262,7 +1262,7 @@ yyreduce:
     break;
 
   case 7:
-#line 55 "shell.y" /* yacc.c:1646  */
+#line 48 "shell.y" /* yacc.c:1646  */
     {
 		prompt();
 	}
@@ -1270,13 +1270,13 @@ yyreduce:
     break;
 
   case 8:
-#line 58 "shell.y" /* yacc.c:1646  */
+#line 51 "shell.y" /* yacc.c:1646  */
     { yyerrok; prompt(); }
 #line 1276 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 9:
-#line 62 "shell.y" /* yacc.c:1646  */
+#line 55 "shell.y" /* yacc.c:1646  */
     {
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}
@@ -1284,24 +1284,24 @@ yyreduce:
     break;
 
   case 12:
-#line 73 "shell.y" /* yacc.c:1646  */
+#line 66 "shell.y" /* yacc.c:1646  */
     {
-		insertArgument(_currentSimpleCommand, (yyvsp[0].string_val) );
+		insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
 	}
 #line 1292 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 80 "shell.y" /* yacc.c:1646  */
+#line 72 "shell.y" /* yacc.c:1646  */
     {
 		_currentSimpleCommand = newSimpleCommand();
-	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val) );
+	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
 	}
 #line 1301 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 87 "shell.y" /* yacc.c:1646  */
+#line 79 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_outFile = (yyvsp[0].string_val);
 	}
@@ -1309,7 +1309,7 @@ yyreduce:
     break;
 
   case 15:
-#line 90 "shell.y" /* yacc.c:1646  */
+#line 82 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_inputFile = (yyvsp[0].string_val);
 	}
@@ -1317,7 +1317,7 @@ yyreduce:
     break;
 
   case 16:
-#line 93 "shell.y" /* yacc.c:1646  */
+#line 85 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_errFile = (yyvsp[0].string_val);
 	}
@@ -1325,7 +1325,7 @@ yyreduce:
     break;
 
   case 17:
-#line 96 "shell.y" /* yacc.c:1646  */
+#line 88 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_appendOutputFile = (yyvsp[0].string_val);
 	}
@@ -1333,7 +1333,7 @@ yyreduce:
     break;
 
   case 18:
-#line 99 "shell.y" /* yacc.c:1646  */
+#line 91 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_inputMatchWord = (yyvsp[0].string_val);
 	}
@@ -1341,7 +1341,7 @@ yyreduce:
     break;
 
   case 20:
-#line 106 "shell.y" /* yacc.c:1646  */
+#line 98 "shell.y" /* yacc.c:1646  */
     {
 		// Nothing done yet;
 	}
@@ -1349,7 +1349,7 @@ yyreduce:
     break;
 
   case 22:
-#line 113 "shell.y" /* yacc.c:1646  */
+#line 105 "shell.y" /* yacc.c:1646  */
     {
 		// Nothing done yet;
 	}
@@ -1357,7 +1357,7 @@ yyreduce:
     break;
 
   case 23:
-#line 119 "shell.y" /* yacc.c:1646  */
+#line 111 "shell.y" /* yacc.c:1646  */
     {
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 		_currentSimpleCommand = newSimpleCommand();
@@ -1595,5 +1595,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 126 "shell.y" /* yacc.c:1906  */
+#line 118 "shell.y" /* yacc.c:1906  */
 

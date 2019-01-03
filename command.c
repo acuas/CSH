@@ -143,6 +143,22 @@ void print(struct Command *_tmp)
 	
 }
 
+void history() {
+	FILE * historyStream = fopen(".csh_history", "r");
+	if (historyStream == NULL) {
+		printf("The file .csh_history can't be opened!\n");
+		exit(EXIT_FAILURE);
+	}
+
+	char * line = NULL;
+	size_t len = 0;
+	ssize_t nread;
+	while ((nread = getline(&line, &len, historyStream)) != -1) {
+		fwrite(line, nread, 1, stdout);
+	}
+	fclose(historyStream);
+}
+
 void execute()
 {
 
@@ -227,29 +243,29 @@ void execute()
 			perror(NULL);
 			return;
 		}
-		else if(pid ==0){
+		else if(pid ==0) {
 			int j = 0;
-			char ** argv = (char **) malloc((_currentCommand->_simpleCommands[i]->_numberOfArguments + 1)* (sizeof(char*)));
+			char ** argv = (char **) malloc((_currentCommand->_simpleCommands[i]->_numberOfArguments + 1) * (sizeof(char*)));
 			// printf("Numarul de argumente este %d\n", _currentCommand->_simpleCommands[i]->_numberOfArguments);
-			for(j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfArguments; j++){
+			for (j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfArguments; j++) {
 				argv[j] =  _currentCommand->_simpleCommands[i]->_arguments[j];
 			}
 			// Add NULL argument at the end
 			argv[_currentCommand->_simpleCommands[i]->_numberOfArguments] = NULL;
 			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[0]);
-		
-			if(strcmp(_currentCommand->_simpleCommands[i]->_arguments[0], "cd") == 0){
+			if (strcmp(_currentCommand->_simpleCommands[i]->_arguments[0], "cd") == 0) {
 				chdir(argv[1]);
-
-				//printf("%s\n", argv[1]);
 			}
-			else{
+			else if (strcmp(_currentCommand->_simpleCommands[i]->_arguments[0], "history") == 0) {
+				history();
+			} 
+			else {
 				execvp(_currentCommand->_simpleCommands[i]->_arguments[0], argv);
 				perror(NULL);
 				_exit(1);
 			}
 		}
-		else{
+		else {
 			
 				wait(NULL);
 		}

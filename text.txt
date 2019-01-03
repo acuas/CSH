@@ -1,1 +1,12 @@
-mamamia
+total 164
+-rw-r--r-- 1 auras auras     0 ian  2 15:59 
+-rw-rw-r-- 1 auras auras  8101 dec 20 16:50 command.c
+-rwxrwxr-x 1 auras auras  1014 dec 20 16:42 command.h
+-rw-rw-r-- 1 auras auras 45308 dec 20 17:02 lex.yy.c
+-rwxrwxr-x 1 auras auras 33760 dec 20 17:02 shell
+-rwxrwxr-x 1 auras auras   507 dec 20 17:01 shell.l
+-rwx------ 1 auras auras  1741 dec 20 17:02 shell.y
+-rw-r--r-- 1 auras auras     6 dec 20 14:17 text2.txt
+-rw-rw-r-- 1 auras auras     8 dec 20 14:16 text.txt
+-rw-r--r-- 1 auras auras 47362 dec 20 17:02 y.tab.c
+-rw-r--r-- 1 auras auras  2495 dec 20 17:02 y.tab.h

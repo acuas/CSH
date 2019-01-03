@@ -72,7 +72,7 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 12 "shell.y" /* yacc.c:1909  */
+#line 5 "shell.y" /* yacc.c:1909  */
 
 	char *string_val;
 

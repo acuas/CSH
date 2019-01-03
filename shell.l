@@ -1,6 +1,8 @@
 %{
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "y.tab.h"
 
 %}
@@ -39,7 +41,7 @@
 		return PIPE;
 	}
 
-[\./a-zA-Z\-][\./a-zA-Z0-9\-]*  {
+[\./a-zA-Z\-!][\./a-zA-Z!0-9\-]*  {
 		/* Assume that file names only have alpha chars */
 		yylval.string_val=strdup(yytext);
 		return WORD;

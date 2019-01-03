@@ -20,6 +20,7 @@
 #include <string.h>
 #include <errno.h>
 #include <stdlib.h>
+#include <ctype.h>
 
 /* end standard C headers. */
 
@@ -371,7 +372,7 @@ static const YY_CHAR yy_ec[256] =
         1,    1,    1,    1,    1,    1,    1,    1,    2,    3,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    1,    1,    1,    1,    1,    1,
-        1,    2,    1,    1,    1,    1,    1,    1,    1,    1,
+        1,    2,    4,    1,    1,    1,    1,    1,    1,    1,
         1,    1,    1,    1,    4,    4,    4,    5,    5,    6,
         5,    5,    5,    5,    5,    5,    5,    1,    1,    7,
         1,    8,    1,    1,    4,    4,    4,    4,    4,    4,
@@ -447,10 +448,12 @@ char *yytext;
 #line 2 "shell.l"
 
 #include <string.h>
+#include <stdio.h>
+#include <stdlib.h>
 #include "y.tab.h"
 
-#line 453 "lex.yy.c"
-#line 454 "lex.yy.c"
+#line 455 "lex.yy.c"
+#line 456 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -564,8 +567,123 @@ static int input ( void );
 			buf[n] = (char) c; \
 		if ( c == '\n' ) \
 			buf[n++] = (char) c; \
+		buf[n] = '\0'; \
 		if ( c == EOF && ferror( yyin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
+		for (int i = 0; i < n; ++i) { \
+			if (buf[i] == '!' && buf[i + 1] == '!') { \
+				FILE * historyStream = fopen(".csh_history", "r"); \
+				if (historyStream == NULL) { \
+					YY_FATAL_ERROR("File for history doesn't exists yet!"); \
+				} \
+				char * line = NULL; \
+				int positionInFile = 0; \
+				int lineLength = 0; \
+				size_t len = 0; \
+				ssize_t nread; \
+				while ((nread = getline(&line, &len, historyStream)) != -1) { \
+					positionInFile = ftell(historyStream); \
+					lineLength = nread; \
+				} \
+				fseek(historyStream, positionInFile - lineLength, SEEK_SET); \
+				nread = getline(&line, &len, historyStream); \
+				if (nread == -1) { \
+					printf("Error in file history! Please write a command before using history navigation!"); \
+					n = 1; \
+					buf[0] = '\n'; \
+					buf[1] = '\0'; \
+					break; \
+				} \
+				memmove(line + nread - 1, line + nread, nread - 1); \
+				char * aux = (char *) calloc(max_size, sizeof(char)); \
+				strncat(aux, buf, i); \
+				strcat(aux, line); \
+				strncat(aux, buf + i + 2, n - i - 2); \
+				int j; \
+				n = strlen(aux); \
+				for (j = 0; j <= n; ++j) { \
+					buf[j] = aux[j]; \
+				} \
+				fclose(historyStream); \
+			} \
+			else if (buf[i] == '!' && isdigit(buf[i + 1])) { \
+				/* Format number */ \
+				int j = i + 2; \
+				int commandN = buf[i + 1] - '0'; \
+				while (j < n && isdigit(buf[j])) { \
+					commandN = commandN * 10 + (buf[j] - '0'); \
+					++j; \
+				} \
+				FILE * historyStream = fopen(".csh_history", "r"); \
+				if (historyStream == NULL) { \
+					YY_FATAL_ERROR("File for history doesn't exists yet!"); \
+				} \
+				int lineNumber = 0; \
+				char * line = NULL; \
+				size_t len = 0; \
+				ssize_t nread; \
+				int found = 0; \
+				while ((nread = getline(&line, &len, historyStream)) != -1) { \
+					++lineNumber; \
+					if (lineNumber == commandN) { \
+						found = 1; \
+						break; \
+					} \
+				} \
+				if (found == 1) { \
+					memmove(line + nread - 1, line + nread, nread - 1); \
+					char * aux = (char *) calloc(max_size, sizeof(char)); \
+					strncat(aux, buf, i); \
+					strcat(aux, line); \
+					strncat(aux, buf + j, n - j); \
+					n = strlen(aux); \
+					for (j = 0; j <= n; ++j) { \
+						buf[j] = aux[j]; \
+					} \
+				} \
+			} \
+		} \
+		printf("%s", buf); \
+		char * copyBuf = (char *) malloc(max_size * sizeof(char)); \
+		char * bufReconstructed = (char *) calloc(max_size, sizeof(char)); \
+		char * lastCommand = (char *) calloc(max_size, sizeof(char)); \
+		strcpy(copyBuf, buf); \
+		char * token = strtok(copyBuf, " \n\t"); \
+		while (token != NULL) { \
+			strcat(bufReconstructed, token); \
+			strcat(bufReconstructed, " \0"); \
+			token = strtok(NULL, " \n\t");					\
+		}						\
+		bufReconstructed[strlen(bufReconstructed) - 1] = '\0'; \
+		FILE * historyStream; \
+		historyStream = fopen(".csh_history", "r+"); \
+		int historyStreamExist = 1; \
+		if (historyStream == NULL) { \
+			historyStreamExist = 0;	 \
+		}							 \
+		else { \
+			char * line = NULL; \
+			size_t len = 0; \
+			while(getline(&line, &len, historyStream) != -1) { \
+				memset(lastCommand, 0, sizeof(lastCommand)); \
+				strcpy(lastCommand, line); \
+			} \
+			lastCommand[strlen(lastCommand) - 1] = '\0'; \
+		} \
+		fclose(historyStream); \
+		if (strcmp(lastCommand, bufReconstructed) != 0) { \
+			/* Write in file .csh_history the current command */ \
+			historyStream = fopen(".csh_history", "a"); \
+			if (historyStream == NULL) \
+				YY_FATAL_ERROR( "error writing in .csh_history" ); \
+			if (strlen(bufReconstructed) > 0) { \
+				fprintf(historyStream, "%s\n", bufReconstructed); \
+			} \
+			fclose(historyStream); \
+		} \
+		free(bufReconstructed); \
+		free(copyBuf); \
+		free(lastCommand); \
 		result = n; \
 		} \
 	else \
@@ -667,10 +785,10 @@ YY_DECL
 		}
 
 	{
-#line 8 "shell.l"
+#line 10 "shell.l"
 
 
-#line 674 "lex.yy.c"
+#line 676 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -730,63 +848,63 @@ do_action:	/* This label is used only to access EOF actions. */
 case 1:
 /* rule 1 can match eol */
 YY_RULE_SETUP
-#line 10 "shell.l"
+#line 12 "shell.l"
 {
 		return NEWLINE;
 	}
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 14 "shell.l"
+#line 16 "shell.l"
 {
 		/* Discard Spaces and Tabs */
     }	
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 18 "shell.l"
+#line 20 "shell.l"
 {
 		return GREAT;
 	}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 22 "shell.l"
+#line 24 "shell.l"
 {
 		return LESS;
 	}
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 26 "shell.l"
+#line 28 "shell.l"
 {
 		return ERR;
 	}
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 30 "shell.l"
+#line 32 "shell.l"
 {
 		return GREATGREAT;
 	}
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 34 "shell.l"
+#line 36 "shell.l"
 {
 		return LESSLESS;
 	}
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 38 "shell.l"
+#line 40 "shell.l"
 {
 		return PIPE;
 	}
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 42 "shell.l"
+#line 44 "shell.l"
 {
 		/* Assume that file names only have alpha chars */
 		yylval.string_val=strdup(yytext);
@@ -795,7 +913,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 48 "shell.l"
+#line 50 "shell.l"
 {
 		/* Invalid character in input */
 		return NOTOKEN;
@@ -803,10 +921,10 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 53 "shell.l"
+#line 55 "shell.l"
 ECHO;
 	YY_BREAK
-#line 810 "lex.yy.c"
+#line 812 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1811,7 +1929,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 53 "shell.l"
+#line 55 "shell.l"
 
 	
 
