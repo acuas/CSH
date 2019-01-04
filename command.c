@@ -132,7 +132,6 @@ void print(struct Command *_tmp)
 			printf("\"%s\" \t", _tmp->_simpleCommands[i]->_arguments[ j ] );
 		}
 	}
-
 	printf( "\n\n" );
 	printf( "  Output       Input        Error        Background\n" );
 	printf( "  ------------ ------------ ------------ ------------\n" );
@@ -185,10 +184,14 @@ void execute()
 
 	// Set the initial Input
 	int fdin;
+	
 	if(_currentCommand->_inputFile) {
 		fdin = open(_currentCommand->_inputFile, O_RDONLY);
 	}
 	else{
+		if(_currentCommand->_inputMatchWord){
+			printf("%s", _currentCommand->_inputMatchWord);
+		}
 		// Use default input
 		fdin = dup(tmpin);
 	}
@@ -208,8 +211,12 @@ void execute()
 				fdout = open(_currentCommand->_outFile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
 			}
 			else{
-				// Use default output
-				fdout = dup(tmpout);
+				if(_currentCommand->_appendOutputFile){ // check for append
+					fdout = open(_currentCommand->_appendOutputFile, O_WRONLY | O_CREAT | O_APPEND, S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+				
+				}else{	//use default Output
+					fdout = dup(tmpout);
+				}
 			}
 			
 			if(_currentCommand->_errFile){
@@ -286,6 +293,7 @@ void execute()
 	// Print new prompt and allocate memory for _currentCommand
 	
 	clear();
+		
 	_currentCommand = newCommand();
     prompt();
 }
@@ -303,5 +311,6 @@ int main() {
     _currentCommand = newCommand();
     prompt();
     yyparse();
+
     return 0;
 }
