@@ -1,6 +1,6 @@
 %token	<string_val> WORD
 
-%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS
+%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS LOGIC_AND LOGIC_OR
 
 %union	{
 	char *string_val;
@@ -29,21 +29,37 @@ int yywrap() {
 %%
 
 goal:	
-	commands
+	first_commands
+	| first_commands logic_and
+	| first_commands logic_or
 	;
 
-commands: 
+logic_and:
+	LOGIC_AND command
+	;
+	
+logic_or:
+	LOGIC_OR command
+	;
+
+first_commands: 
 	command
-	| commands command 
+	| first_commands command
 	;
 
-command: simple_command
-        ;
+command:
+	simple_command
+	;
 
 simple_command:	
 	command_and_args iomodifier_opt NEWLINE {
 		execute();
-		
+	}
+	| command_and_args iomodifier_opt logic_and {
+		_commandQueueBack->logicAnd = 1;
+	}
+	| command_and_args iomodifier_opt logic_or {
+		_commandQueueBack->logicOr = 1;
 	}
 	| NEWLINE {
 		prompt();
@@ -58,7 +74,7 @@ command_and_args:
 	;
 
 arg_list:
-	arg_list argument 
+	arg_list argument
 	|
 	;
 
@@ -70,6 +86,19 @@ argument:
 
 command_word:
 	WORD {
+		struct CommandQueue *tmp = initializeCommandQueue();
+		_currentCommand = newCommand();
+		tmp->command = _currentCommand;
+		if (_commandQueue == NULL)
+		{
+			_commandQueue = tmp;
+			_commandQueueBack = _commandQueue;
+		}
+		else
+		{
+			_commandQueueBack->next = tmp;
+			_commandQueueBack = tmp;
+		}
 		_currentSimpleCommand = newSimpleCommand();
 	    insertArgument(_currentSimpleCommand, $1);
 	}

@@ -63,7 +63,7 @@
 
 /* Copy the first part of user declarations.  */
 
-#line 67 "y.tab.c" /* yacc.c:339  */
+#line 67 "shell.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -82,9 +82,9 @@
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "y.tab.h".  */
-#ifndef YY_YY_Y_TAB_H_INCLUDED
-# define YY_YY_Y_TAB_H_INCLUDED
+   by #include "shell.tab.h".  */
+#ifndef YY_YY_SHELL_TAB_H_INCLUDED
+# define YY_YY_SHELL_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -106,19 +106,11 @@ extern int yydebug;
     NEWLINE = 263,
     PIPE = 264,
     GREATGREAT = 265,
-    LESSLESS = 266
+    LESSLESS = 266,
+    LOGIC_AND = 267,
+    LOGIC_OR = 268
   };
 #endif
-/* Tokens.  */
-#define WORD 258
-#define NOTOKEN 259
-#define GREAT 260
-#define LESS 261
-#define ERR 262
-#define NEWLINE 263
-#define PIPE 264
-#define GREATGREAT 265
-#define LESSLESS 266
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -129,7 +121,7 @@ union YYSTYPE
 
 	char *string_val;
 
-#line 133 "y.tab.c" /* yacc.c:355  */
+#line 125 "shell.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -142,7 +134,7 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
+#endif /* !YY_YY_SHELL_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 #line 9 "shell.y" /* yacc.c:358  */
@@ -164,7 +156,7 @@ int yywrap() {
 } 
 
 
-#line 168 "y.tab.c" /* yacc.c:358  */
+#line 160 "shell.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -406,21 +398,21 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  11
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   26
+#define YYLAST   33
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  12
+#define YYNTOKENS  14
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  13
+#define YYNNTS  15
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  23
+#define YYNRULES  29
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  35
+#define YYNSTATES  43
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
 #define YYUNDEFTOK  2
-#define YYMAXUTOK   266
+#define YYMAXUTOK   268
 
 #define YYTRANSLATE(YYX)                                                \
   ((unsigned int) (YYX) <= YYMAXUTOK ? yytranslate[YYX] : YYUNDEFTOK)
@@ -455,16 +447,16 @@ static const yytype_uint8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9,    10,    11
+       5,     6,     7,     8,     9,    10,    11,    12,    13
 };
 
 #if YYDEBUG
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    32,    32,    36,    37,    40,    44,    48,    51,    55,
-      61,    62,    66,    72,    79,    82,    85,    88,    91,    94,
-      98,   101,   105,   111
+       0,    32,    32,    33,    34,    38,    42,    46,    47,    51,
+      55,    58,    61,    64,    67,    71,    77,    78,    82,    88,
+     108,   111,   114,   117,   120,   123,   127,   130,   134,   140
 };
 #endif
 
@@ -474,10 +466,11 @@ static const yytype_uint8 yyrline[] =
 static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "WORD", "NOTOKEN", "GREAT", "LESS",
-  "ERR", "NEWLINE", "PIPE", "GREATGREAT", "LESSLESS", "$accept", "goal",
-  "commands", "command", "simple_command", "command_and_args", "arg_list",
-  "argument", "command_word", "iomodifier_opt", "pipe",
-  "command_and_args_for_pipe", "command_word_for_pipe", YY_NULLPTR
+  "ERR", "NEWLINE", "PIPE", "GREATGREAT", "LESSLESS", "LOGIC_AND",
+  "LOGIC_OR", "$accept", "goal", "logic_and", "logic_or", "first_commands",
+  "command", "simple_command", "command_and_args", "arg_list", "argument",
+  "command_word", "iomodifier_opt", "pipe", "command_and_args_for_pipe",
+  "command_word_for_pipe", YY_NULLPTR
 };
 #endif
 
@@ -487,14 +480,14 @@ static const char *const yytname[] =
 static const yytype_uint16 yytoknum[] =
 {
        0,   256,   257,   258,   259,   260,   261,   262,   263,   264,
-     265,   266
+     265,   266,   267,   268
 };
 # endif
 
-#define YYPACT_NINF -9
+#define YYPACT_NINF -10
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-9)))
+  (!!((Yystate) == (-10)))
 
 #define YYTABLE_NINF -3
 
@@ -505,10 +498,11 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-       1,    -3,    -9,    -9,     6,     0,    -9,    -9,     5,    -9,
-      -9,    -9,    -9,    11,    14,    15,    16,    17,    13,     4,
-      -9,    -9,    -9,    -9,    -9,    -9,    -9,    19,    -9,    -9,
-      -9,    -9,    -9,     4,    -9
+       3,    -1,   -10,   -10,     5,     0,   -10,   -10,     9,   -10,
+     -10,   -10,     3,     3,   -10,   -10,   -10,    15,    19,    21,
+      24,    25,    13,    14,   -10,   -10,   -10,   -10,   -10,   -10,
+     -10,   -10,   -10,   -10,   -10,    26,   -10,   -10,   -10,   -10,
+     -10,    14,   -10
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -516,24 +510,25 @@ static const yytype_int8 yypact[] =
      means the default is an error.  */
 static const yytype_uint8 yydefact[] =
 {
-       0,     0,    13,     7,     0,     0,     3,     5,    19,    11,
-       8,     1,     4,     0,     0,     0,     0,     0,     0,    21,
-      14,    15,    16,    17,    18,     6,    12,     0,    10,     9,
-      23,    20,    11,    21,    22
+       0,     0,    19,    13,     0,     0,     7,     9,    25,    17,
+      14,     1,     0,     0,     3,     4,     8,     0,     0,     0,
+       0,     0,     0,    27,     5,     6,    20,    21,    22,    23,
+      24,    10,    11,    12,    18,     0,    16,    15,    29,    26,
+      17,    27,    28
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-      -9,    -9,    -9,    18,    -9,    -9,    -8,    -9,    -9,    -9,
-      -7,    -9,    -9
+     -10,   -10,     8,    10,   -10,    -3,   -10,   -10,    -9,   -10,
+     -10,   -10,    -8,   -10,   -10
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     4,     5,     6,     7,     8,    19,    28,     9,    18,
-      29,    31,    32
+      -1,     4,    14,    15,     5,     6,     7,     8,    23,    36,
+       9,    22,    37,    39,    40
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -541,42 +536,45 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-      -2,     1,     1,     2,     2,    10,    11,    26,     3,     3,
-      13,    14,    15,    27,    20,    16,    17,    21,    22,    23,
-      24,    25,    30,    12,    33,     0,    34
+      -2,     1,    16,     2,     1,    11,     2,    10,     3,    24,
+      25,     3,    12,    13,    17,    18,    19,    34,    26,    20,
+      21,    31,    27,    35,    28,    12,    13,    29,    30,    38,
+      32,    41,    33,    42
 };
 
-static const yytype_int8 yycheck[] =
+static const yytype_uint8 yycheck[] =
 {
-       0,     1,     1,     3,     3,     8,     0,     3,     8,     8,
-       5,     6,     7,     9,     3,    10,    11,     3,     3,     3,
-       3,     8,     3,     5,    32,    -1,    33
+       0,     1,     5,     3,     1,     0,     3,     8,     8,    12,
+      13,     8,    12,    13,     5,     6,     7,     3,     3,    10,
+      11,     8,     3,     9,     3,    12,    13,     3,     3,     3,
+      22,    40,    22,    41
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
      symbol of state STATE-NUM.  */
 static const yytype_uint8 yystos[] =
 {
-       0,     1,     3,     8,    13,    14,    15,    16,    17,    20,
-       8,     0,    15,     5,     6,     7,    10,    11,    21,    18,
-       3,     3,     3,     3,     3,     8,     3,     9,    19,    22,
-       3,    23,    24,    18,    22
+       0,     1,     3,     8,    15,    18,    19,    20,    21,    24,
+       8,     0,    12,    13,    16,    17,    19,     5,     6,     7,
+      10,    11,    25,    22,    19,    19,     3,     3,     3,     3,
+       3,     8,    16,    17,     3,     9,    23,    26,     3,    27,
+      28,    22,    26
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
-       0,    12,    13,    14,    14,    15,    16,    16,    16,    17,
-      18,    18,    19,    20,    21,    21,    21,    21,    21,    21,
-      22,    22,    23,    24
+       0,    14,    15,    15,    15,    16,    17,    18,    18,    19,
+      20,    20,    20,    20,    20,    21,    22,    22,    23,    24,
+      25,    25,    25,    25,    25,    25,    26,    26,    27,    28
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
-       0,     2,     1,     1,     2,     1,     3,     1,     2,     3,
-       2,     0,     1,     1,     2,     2,     2,     2,     2,     0,
-       2,     0,     3,     1
+       0,     2,     1,     2,     2,     2,     2,     1,     2,     1,
+       3,     3,     3,     1,     2,     3,     2,     0,     1,     1,
+       2,     2,     2,     2,     2,     0,     2,     0,     3,     1
 };
 
 
@@ -1252,122 +1250,150 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 6:
-#line 44 "shell.y" /* yacc.c:1646  */
-    {
-		execute();
-		
-	}
-#line 1262 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 7:
-#line 48 "shell.y" /* yacc.c:1646  */
-    {
-		prompt();
-	}
-#line 1270 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 8:
-#line 51 "shell.y" /* yacc.c:1646  */
-    { yyerrok; prompt(); }
-#line 1276 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 9:
+        case 10:
 #line 55 "shell.y" /* yacc.c:1646  */
     {
-		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
+		execute();
 	}
-#line 1284 "y.tab.c" /* yacc.c:1646  */
+#line 1259 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 11:
+#line 58 "shell.y" /* yacc.c:1646  */
+    {
+		_commandQueueBack->logicAnd = 1;
+	}
+#line 1267 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 66 "shell.y" /* yacc.c:1646  */
+#line 61 "shell.y" /* yacc.c:1646  */
     {
-		insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
+		_commandQueueBack->logicOr = 1;
 	}
-#line 1292 "y.tab.c" /* yacc.c:1646  */
+#line 1275 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
-#line 72 "shell.y" /* yacc.c:1646  */
+#line 64 "shell.y" /* yacc.c:1646  */
     {
-		_currentSimpleCommand = newSimpleCommand();
-	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
+		prompt();
 	}
-#line 1301 "y.tab.c" /* yacc.c:1646  */
+#line 1283 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
-#line 79 "shell.y" /* yacc.c:1646  */
-    {
-		_currentCommand->_outFile = (yyvsp[0].string_val);
-	}
-#line 1309 "y.tab.c" /* yacc.c:1646  */
+#line 67 "shell.y" /* yacc.c:1646  */
+    { yyerrok; prompt(); }
+#line 1289 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 82 "shell.y" /* yacc.c:1646  */
+#line 71 "shell.y" /* yacc.c:1646  */
     {
-		_currentCommand->_inputFile = (yyvsp[0].string_val);
+		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}
-#line 1317 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 16:
-#line 85 "shell.y" /* yacc.c:1646  */
-    {
-		_currentCommand->_errFile = (yyvsp[0].string_val);
-	}
-#line 1325 "y.tab.c" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 88 "shell.y" /* yacc.c:1646  */
-    {
-		_currentCommand->_appendOutputFile = (yyvsp[0].string_val);
-	}
-#line 1333 "y.tab.c" /* yacc.c:1646  */
+#line 1297 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 91 "shell.y" /* yacc.c:1646  */
+#line 82 "shell.y" /* yacc.c:1646  */
     {
-		_currentCommand->_inputMatchWord = (yyvsp[0].string_val);
+		insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
 	}
-#line 1341 "y.tab.c" /* yacc.c:1646  */
+#line 1305 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 19:
+#line 88 "shell.y" /* yacc.c:1646  */
+    {
+		struct CommandQueue *tmp = initializeCommandQueue();
+		_currentCommand = newCommand();
+		tmp->command = _currentCommand;
+		if (_commandQueue == NULL)
+		{
+			_commandQueue = tmp;
+			_commandQueueBack = _commandQueue;
+		}
+		else
+		{
+			_commandQueueBack->next = tmp;
+			_commandQueueBack = tmp;
+		}
+		_currentSimpleCommand = newSimpleCommand();
+	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
+	}
+#line 1327 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 98 "shell.y" /* yacc.c:1646  */
+#line 108 "shell.y" /* yacc.c:1646  */
     {
-		// Nothing done yet;
+		_currentCommand->_outFile = (yyvsp[0].string_val);
 	}
-#line 1349 "y.tab.c" /* yacc.c:1646  */
+#line 1335 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 111 "shell.y" /* yacc.c:1646  */
+    {
+		_currentCommand->_inputFile = (yyvsp[0].string_val);
+	}
+#line 1343 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 105 "shell.y" /* yacc.c:1646  */
+#line 114 "shell.y" /* yacc.c:1646  */
     {
-		// Nothing done yet;
+		_currentCommand->_errFile = (yyvsp[0].string_val);
 	}
-#line 1357 "y.tab.c" /* yacc.c:1646  */
+#line 1351 "shell.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 111 "shell.y" /* yacc.c:1646  */
+#line 117 "shell.y" /* yacc.c:1646  */
+    {
+		_currentCommand->_appendOutputFile = (yyvsp[0].string_val);
+	}
+#line 1359 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 24:
+#line 120 "shell.y" /* yacc.c:1646  */
+    {
+		_currentCommand->_inputMatchWord = (yyvsp[0].string_val);
+	}
+#line 1367 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 26:
+#line 127 "shell.y" /* yacc.c:1646  */
+    {
+		// Nothing done yet;
+	}
+#line 1375 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 134 "shell.y" /* yacc.c:1646  */
+    {
+		// Nothing done yet;
+	}
+#line 1383 "shell.tab.c" /* yacc.c:1646  */
+    break;
+
+  case 29:
+#line 140 "shell.y" /* yacc.c:1646  */
     {
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 		_currentSimpleCommand = newSimpleCommand();
 	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val) );
 	}
-#line 1367 "y.tab.c" /* yacc.c:1646  */
+#line 1393 "shell.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1371 "y.tab.c" /* yacc.c:1646  */
+#line 1397 "shell.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1595,5 +1621,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 118 "shell.y" /* yacc.c:1906  */
+#line 147 "shell.y" /* yacc.c:1906  */
 

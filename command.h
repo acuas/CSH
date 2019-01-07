@@ -28,16 +28,29 @@ struct Command {
 	int _background;
 };
 
+struct CommandQueue {
+	int succesExit;
+	int logicAnd;
+	int logicOr;
+	struct Command *command;
+	struct CommandQueue *next;
+};
+
 // Static variables 
+struct CommandQueue *_commandQueue, *_commandQueueBack;
 struct Command *_currentCommand;
 struct SimpleCommand *_currentSimpleCommand;
 
 void prompt();
 void print(struct Command *_tmp);
+void printCommandQueue();
 void execute();
-void clear();
+void executeCommand(struct Command *, struct CommandQueue *);
+void clearCommandQueue();
+void clearCommand();
 void insertSimpleCommand(struct Command *,struct SimpleCommand * simpleCommand );
 struct Command *newCommand();
+struct CommandQueue *initializeCommandQueue();
 
 void getTheRightUser();
 extern char *userName;

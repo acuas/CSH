@@ -13,6 +13,14 @@
 		return NEWLINE;
 	}
 
+"&&"	{
+		return LOGIC_AND;
+	}
+
+"||"	{
+		return LOGIC_OR;
+	}
+
 [ \t] 	{
 		/* Discard Spaces and Tabs */
     }	
