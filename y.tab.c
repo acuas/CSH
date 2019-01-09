@@ -63,7 +63,7 @@
 
 /* Copy the first part of user declarations.  */
 
-#line 67 "shell.tab.c" /* yacc.c:339  */
+#line 67 "y.tab.c" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -82,9 +82,9 @@
 #endif
 
 /* In a future release of Bison, this section will be replaced
-   by #include "shell.tab.h".  */
-#ifndef YY_YY_SHELL_TAB_H_INCLUDED
-# define YY_YY_SHELL_TAB_H_INCLUDED
+   by #include "y.tab.h".  */
+#ifndef YY_YY_Y_TAB_H_INCLUDED
+# define YY_YY_Y_TAB_H_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -111,6 +111,18 @@ extern int yydebug;
     LOGIC_OR = 268
   };
 #endif
+/* Tokens.  */
+#define WORD 258
+#define NOTOKEN 259
+#define GREAT 260
+#define LESS 261
+#define ERR 262
+#define NEWLINE 263
+#define PIPE 264
+#define GREATGREAT 265
+#define LESSLESS 266
+#define LOGIC_AND 267
+#define LOGIC_OR 268
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -121,7 +133,7 @@ union YYSTYPE
 
 	char *string_val;
 
-#line 125 "shell.tab.c" /* yacc.c:355  */
+#line 137 "y.tab.c" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -134,7 +146,7 @@ extern YYSTYPE yylval;
 
 int yyparse (void);
 
-#endif /* !YY_YY_SHELL_TAB_H_INCLUDED  */
+#endif /* !YY_YY_Y_TAB_H_INCLUDED  */
 
 /* Copy the second part of user declarations.  */
 #line 9 "shell.y" /* yacc.c:358  */
@@ -156,7 +168,7 @@ int yywrap() {
 } 
 
 
-#line 160 "shell.tab.c" /* yacc.c:358  */
+#line 172 "y.tab.c" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -455,8 +467,8 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyrline[] =
 {
        0,    32,    32,    33,    34,    38,    42,    46,    47,    51,
-      55,    58,    61,    64,    67,    71,    77,    78,    82,    88,
-     108,   111,   114,   117,   120,   123,   127,   130,   134,   140
+      55,    58,    61,    64,    67,    74,    80,    81,    85,    91,
+     111,   114,   117,   120,   123,   126,   130,   133,   137,   143
 };
 #endif
 
@@ -1255,7 +1267,7 @@ yyreduce:
     {
 		execute();
 	}
-#line 1259 "shell.tab.c" /* yacc.c:1646  */
+#line 1271 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 11:
@@ -1263,7 +1275,7 @@ yyreduce:
     {
 		_commandQueueBack->logicAnd = 1;
 	}
-#line 1267 "shell.tab.c" /* yacc.c:1646  */
+#line 1279 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 12:
@@ -1271,7 +1283,7 @@ yyreduce:
     {
 		_commandQueueBack->logicOr = 1;
 	}
-#line 1275 "shell.tab.c" /* yacc.c:1646  */
+#line 1287 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 13:
@@ -1279,33 +1291,36 @@ yyreduce:
     {
 		prompt();
 	}
-#line 1283 "shell.tab.c" /* yacc.c:1646  */
+#line 1295 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 14:
 #line 67 "shell.y" /* yacc.c:1646  */
-    { yyerrok; prompt(); }
-#line 1289 "shell.tab.c" /* yacc.c:1646  */
+    { 
+		yyerrok; 
+		prompt(); 
+	}
+#line 1304 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 15:
-#line 71 "shell.y" /* yacc.c:1646  */
+#line 74 "shell.y" /* yacc.c:1646  */
     {
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 	}
-#line 1297 "shell.tab.c" /* yacc.c:1646  */
+#line 1312 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 82 "shell.y" /* yacc.c:1646  */
+#line 85 "shell.y" /* yacc.c:1646  */
     {
 		insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
 	}
-#line 1305 "shell.tab.c" /* yacc.c:1646  */
+#line 1320 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 88 "shell.y" /* yacc.c:1646  */
+#line 91 "shell.y" /* yacc.c:1646  */
     {
 		struct CommandQueue *tmp = initializeCommandQueue();
 		_currentCommand = newCommand();
@@ -1323,77 +1338,77 @@ yyreduce:
 		_currentSimpleCommand = newSimpleCommand();
 	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val));
 	}
-#line 1327 "shell.tab.c" /* yacc.c:1646  */
+#line 1342 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 108 "shell.y" /* yacc.c:1646  */
+#line 111 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_outFile = (yyvsp[0].string_val);
 	}
-#line 1335 "shell.tab.c" /* yacc.c:1646  */
+#line 1350 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 21:
-#line 111 "shell.y" /* yacc.c:1646  */
+#line 114 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_inputFile = (yyvsp[0].string_val);
 	}
-#line 1343 "shell.tab.c" /* yacc.c:1646  */
+#line 1358 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 22:
-#line 114 "shell.y" /* yacc.c:1646  */
+#line 117 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_errFile = (yyvsp[0].string_val);
 	}
-#line 1351 "shell.tab.c" /* yacc.c:1646  */
+#line 1366 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 23:
-#line 117 "shell.y" /* yacc.c:1646  */
+#line 120 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_appendOutputFile = (yyvsp[0].string_val);
 	}
-#line 1359 "shell.tab.c" /* yacc.c:1646  */
+#line 1374 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 120 "shell.y" /* yacc.c:1646  */
+#line 123 "shell.y" /* yacc.c:1646  */
     {
 		_currentCommand->_inputMatchWord = (yyvsp[0].string_val);
 	}
-#line 1367 "shell.tab.c" /* yacc.c:1646  */
+#line 1382 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 127 "shell.y" /* yacc.c:1646  */
+#line 130 "shell.y" /* yacc.c:1646  */
     {
 		// Nothing done yet;
 	}
-#line 1375 "shell.tab.c" /* yacc.c:1646  */
+#line 1390 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 28:
-#line 134 "shell.y" /* yacc.c:1646  */
+#line 137 "shell.y" /* yacc.c:1646  */
     {
 		// Nothing done yet;
 	}
-#line 1383 "shell.tab.c" /* yacc.c:1646  */
+#line 1398 "y.tab.c" /* yacc.c:1646  */
     break;
 
   case 29:
-#line 140 "shell.y" /* yacc.c:1646  */
+#line 143 "shell.y" /* yacc.c:1646  */
     {
 		insertSimpleCommand( _currentCommand, _currentSimpleCommand );
 		_currentSimpleCommand = newSimpleCommand();
 	    insertArgument(_currentSimpleCommand, (yyvsp[0].string_val) );
 	}
-#line 1393 "shell.tab.c" /* yacc.c:1646  */
+#line 1408 "y.tab.c" /* yacc.c:1646  */
     break;
 
 
-#line 1397 "shell.tab.c" /* yacc.c:1646  */
+#line 1412 "y.tab.c" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -1621,5 +1636,5 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 147 "shell.y" /* yacc.c:1906  */
+#line 150 "shell.y" /* yacc.c:1906  */
 

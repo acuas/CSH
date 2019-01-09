@@ -64,7 +64,10 @@ simple_command:
 	| NEWLINE {
 		prompt();
 	}
-	| error NEWLINE { yyerrok; prompt(); }
+	| error NEWLINE { 
+		yyerrok; 
+		prompt(); 
+	}
 	;
 
 command_and_args:

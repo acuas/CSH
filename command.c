@@ -63,7 +63,7 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
 
 struct Command *newCommand() {
     // Create available space for one simple command
-    struct Command *_tmp = (struct Command *)malloc(sizeof(struct Command));
+    struct Command *_tmp = (struct Command *) malloc(sizeof(struct Command));
     _tmp->_numberOfAvailableSimpleCommands = 5;
     _tmp->_numberOfSimpleCommands = 0;
 	_tmp->_simpleCommands = (struct SimpleCommand **)
@@ -79,10 +79,9 @@ struct Command *newCommand() {
 }
 
 void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleCommand) {
-    //printf("%d %d", _tmp->_numberOfAvailableSimpleCommands, _tmp->_numberOfSimpleCommands);
     if (_tmp->_numberOfAvailableSimpleCommands == _tmp->_numberOfSimpleCommands) {
 		_tmp->_numberOfAvailableSimpleCommands *= 2;
-        struct SimpleCommand **moreSimpleCommand = (struct SimpleCommand **)realloc(_tmp->_simpleCommands,
+        struct SimpleCommand **moreSimpleCommand = (struct SimpleCommand **) realloc(_tmp->_simpleCommands,
 			 _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand *));
         if (moreSimpleCommand != NULL) {
             // Succes reallocating memory
@@ -101,32 +100,33 @@ void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleComm
 }
 
 void clearCommandQueue() {
+	deleted = 0;
 	struct CommandQueue *tmp1, *tmp2;
 	tmp1 = _commandQueue;
 	tmp2 = tmp1;
 	while (tmp1 != NULL) {
 		tmp1 = tmp1->next;
-		clearCommand(tmp2->command);
-		free(tmp2);
+		//clearCommand(tmp2->command);
+		//free(tmp2);
 		tmp2 = tmp1;
 	}
 	_commandQueue = NULL;
 }
 
 void clearCommand(struct Command *command) {
-	int i, j;
-	for (i = 0; i < command -> _numberOfSimpleCommands; ++i) {
-			for (j = 0; j < command -> _simpleCommands[i]->_numberOfAvailableArguments; ++j) {
-				//printf("%s ", command-> _simpleCommands[i] -> _arguments[j]);
-				if (command->_simpleCommands[i]->_arguments[j] != NULL)
-					free(command->_simpleCommands[i]->_arguments[j]);
-			}
-			free(command->_simpleCommands[i]->_arguments);
-			free(command->_simpleCommands[i]);
-	}
-	//free(_currentSimpleCommand);
-	free(command);
+	int i;
+    for (i = 0; i < _currentCommand->_numberOfSimpleCommands; ++i) {
+        int j;
+        for (j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfAvailableArguments; ++j) {
+            free(_currentCommand->_simpleCommands[i]->_arguments[j]);
+        }
+        free(_currentCommand->_simpleCommands[i]->_arguments);
+        free(_currentCommand->_simpleCommands[i]);
+    }
+
+    free(_currentCommand);
 }
+
 void print(struct Command *_tmp) {
 	printf("\n\n");
 	printf("              COMMAND TABLE                \n");
@@ -187,14 +187,6 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		prompt();
 		return;
 	}
-
-	// Print contents of Command data structure
-	//print(_currentCommand);
-	//printCommandQueue();
-	// Add execution here
-	// For every simple command fork a new process
-	// Setup i/o redirection
-	// and call exec
 
 	// save IN/OUT/ERR
 

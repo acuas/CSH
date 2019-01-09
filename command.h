@@ -1,4 +1,3 @@
-
 #ifndef command_h
 #define command_h
 
@@ -53,6 +52,7 @@ struct Command *newCommand();
 struct CommandQueue *initializeCommandQueue();
 
 void getTheRightUser();
+int deleted;
 extern char *userName;
 extern char *machineName;
 
