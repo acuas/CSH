@@ -85,7 +85,9 @@ void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleComm
 			 _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand *));
         if (moreSimpleCommand != NULL) {
             // Succes reallocating memory
-            //_tmp->_simpleCommands = moreSimpleCommand;
+            _tmp->_simpleCommands = moreSimpleCommand;
+			for (int i = _tmp->_numberOfAvailableSimpleCommands / 2; i < _tmp->_numberOfAvailableSimpleCommands; i++)
+				_tmp->_simpleCommands[i] = NULL;
         }
         else {
             // Error reallocating memory
@@ -107,7 +109,7 @@ void clearCommandQueue() {
 	while (tmp1 != NULL) {
 		tmp1 = tmp1->next;
 		//clearCommand(tmp2->command);
-		//free(tmp2);
+		free(tmp2);
 		tmp2 = tmp1;
 	}
 	_commandQueue = NULL;
@@ -115,16 +117,18 @@ void clearCommandQueue() {
 
 void clearCommand(struct Command *command) {
 	int i;
-    for (i = 0; i < _currentCommand->_numberOfSimpleCommands; ++i) {
+    for (i = 0; i < command->_numberOfAvailableSimpleCommands; ++i) {
         int j;
-        for (j = 0; j < _currentCommand->_simpleCommands[i]->_numberOfAvailableArguments; ++j) {
-            free(_currentCommand->_simpleCommands[i]->_arguments[j]);
-        }
-        free(_currentCommand->_simpleCommands[i]->_arguments);
-        free(_currentCommand->_simpleCommands[i]);
+		if (command->_simpleCommands[i] != NULL) {
+			for (j = 0; j < command->_simpleCommands[i]->_numberOfAvailableArguments; ++j) {
+				free(command->_simpleCommands[i]->_arguments[j]);
+			}
+			free(command->_simpleCommands[i]->_arguments);
+			free(command->_simpleCommands[i]);
+		}
     }
-
-    free(_currentCommand);
+	free(command->_simpleCommands);
+    free(command);
 }
 
 void print(struct Command *_tmp) {
@@ -169,6 +173,7 @@ void history() {
 
 void execute() {
 	struct CommandQueue *tmp = _commandQueue;
+	printCommandQueue();
 	while (tmp != NULL) {
 		executeCommand(tmp->command, tmp);
 		if (tmp->logicAnd == 1 && tmp->succesExit == 0)
@@ -221,6 +226,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			// Last simple command
 			if (command->_outFile) {
 				fdout = open(command->_outFile, O_WRONLY | O_CREAT, S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+				ftruncate(fdout, 0);
 			}
 			else {
 				if (command->_appendOutputFile) { // check for append
@@ -240,7 +246,6 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			}
 			
 		}
-
 		else {
 			// Not last simple command create pipe
 			int fdpipe[2];
@@ -313,11 +318,12 @@ struct CommandQueue *initializeCommandQueue() {
 
 void printCommandQueue() {
 	printf("\n\n");
-	printf("              COMMAND Stack                \n");
+	printf("              COMMAND Queue                \n");
 	printf("\n");
 	
 	for (struct CommandQueue *temp = _commandQueue; temp != NULL; temp = temp->next) {
 		printf("  #   Commands\n");
+	printf("Logic  AND = %d         Logic  OR = %d\n", temp->logicAnd, temp->logicOr);
 	printf("  -------------------------------------------------------------\n");
 	for (int i = 0; i < temp->command->_numberOfSimpleCommands; i++) {
 		printf("  %-3d ", i );
@@ -345,9 +351,7 @@ void prompt() {
 int yyparse(void);
 
 int main() {
-    _currentCommand = newCommand();
     prompt();
     yyparse();
-
     return 0;
 }

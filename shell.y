@@ -35,11 +35,15 @@ goal:
 	;
 
 logic_and:
-	LOGIC_AND command
+	LOGIC_AND {
+		logicAND = 1;
+	}
 	;
 	
 logic_or:
-	LOGIC_OR command
+	LOGIC_OR {
+		logicOR = 1;
+	}
 	;
 
 first_commands: 
@@ -55,16 +59,12 @@ simple_command:
 	command_and_args iomodifier_opt NEWLINE {
 		execute();
 	}
-	| command_and_args iomodifier_opt logic_and {
-		_commandQueueBack->logicAnd = 1;
-	}
-	| command_and_args iomodifier_opt logic_or {
-		_commandQueueBack->logicOr = 1;
-	}
+	| command_and_args iomodifier_opt logic_and command
+	| command_and_args iomodifier_opt logic_or command
 	| NEWLINE {
 		prompt();
 	}
-	| error NEWLINE { 
+	| error NEWLINE {
 		yyerrok; 
 		prompt(); 
 	}
@@ -102,6 +102,10 @@ command_word:
 			_commandQueueBack->next = tmp;
 			_commandQueueBack = tmp;
 		}
+		_commandQueueBack->logicAnd = logicAND;
+		_commandQueueBack->logicOr = logicOR;
+		logicAND = 0;
+		logicOR = 0;
 		_currentSimpleCommand = newSimpleCommand();
 	    insertArgument(_currentSimpleCommand, $1);
 	}

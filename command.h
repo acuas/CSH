@@ -11,19 +11,19 @@ struct SimpleCommand {
 	char ** _arguments;
 };
 
-void insertArgument(struct SimpleCommand *, char * argument);
+void insertArgument(struct SimpleCommand *, char *);
 struct SimpleCommand *newSimpleCommand();
 
 struct Command {
 	int _numberOfAvailableSimpleCommands;
 	int _numberOfSimpleCommands;
-	struct SimpleCommand ** _simpleCommands;
-	char * _outFile;
-	char * _inputFile;
-	char * _errFile;
-	char * _appendOutputFile;
-	char * _inputMatchWord;
-	char * _doubleErrFile;
+	struct SimpleCommand **_simpleCommands;
+	char *_outFile;
+	char *_inputFile;
+	char *_errFile;
+	char *_appendOutputFile;
+	char *_inputMatchWord;
+	char *_doubleErrFile;
 	int _background;
 };
 
@@ -41,18 +41,19 @@ struct Command *_currentCommand;
 struct SimpleCommand *_currentSimpleCommand;
 
 void prompt();
-void print(struct Command *_tmp);
+void print(struct Command *);
 void printCommandQueue();
 void execute();
 void executeCommand(struct Command *, struct CommandQueue *);
 void clearCommandQueue();
 void clearCommand();
-void insertSimpleCommand(struct Command *,struct SimpleCommand * simpleCommand );
+void insertSimpleCommand(struct Command *,struct SimpleCommand *);
 struct Command *newCommand();
 struct CommandQueue *initializeCommandQueue();
 
 void getTheRightUser();
 int deleted;
+int logicAND, logicOR;
 extern char *userName;
 extern char *machineName;
 
