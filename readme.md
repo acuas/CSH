@@ -36,11 +36,11 @@ The CSHELL implements ```&&``` and ```||``` for logical expression using the fun
 struct CommandQueue* initializeCommandQueue()
 ```
 
-The history is kept into a file which can be read later to saw all the commands you typed, handled by the ```void history()``` function.
+The history is kept into a file which can be read later to see all the commands you typed, handled by the ```void history()``` function.
 
 Getting the username and the machine name is done by the ```void getTheRightUser()``` and then passed to the ```void prompt()```.
 
-Following part
+The following part
 ```C
 struct sigaction s_child;
 s_child.sa_handler = sigHandler;
