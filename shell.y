@@ -127,7 +127,23 @@ iomodifier_opt:
 	| LESSLESS WORD {
 		_currentCommand->_inputMatchWord = $2;
 	}
-	| 
+	| GREAT WORD LESS WORD {
+		_currentCommand->_outFile = $2;
+		_currentCommand->_inputFile = $4;
+	}
+	| LESS WORD GREAT WORD {
+		_currentCommand->_outFile = $4;
+		_currentCommand->_inputFile = $2;
+	}
+	| GREATGREAT WORD LESS WORD {
+		_currentCommand->_appendOutputFile = $2;
+		_currentCommand->_inputFile = $4;
+	}
+	| LESS WORD GREATGREAT WORD {
+		_currentCommand->_appendOutputFile = $4;
+		_currentCommand->_inputFile = $2;
+	}
+	|
 	;
 
 pipe: 

@@ -54,6 +54,7 @@ struct CommandQueue *initializeCommandQueue();
 void getTheRightUser();
 int deleted;
 int logicAND, logicOR;
+int exitStatus;
 extern char *userName;
 extern char *machineName;
 
