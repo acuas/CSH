@@ -202,7 +202,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		prompt();
 		return;
 	}
-
+	exitStatus = 0;
 	// save IN/OUT/ERR
 
 	int tmpin = dup(STDIN_FILENO);
@@ -328,15 +328,20 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			} 
 			else {
 				commandQueue->succesExit = 1;
-				execvp(command->_simpleCommands[i]->_arguments[0], argv);
+				exitStatus = execvp(command->_simpleCommands[i]->_arguments[0], argv);
 				commandQueue->succesExit = 0;
 				perror(NULL);
 				_exit(1);
 			}
 		}
 		else {
+<<<<<<< HEAD
 			if(!command->_background)
 				waitpid(pid, &stat_loc, WUNTRACED);
+=======
+			wait(NULL);
+			printf("exit status %d\n", exitStatus);
+>>>>>>> 8f888c286cfc1a95f51d44e69fcbd49063b5637c
 		}
 	}
 
