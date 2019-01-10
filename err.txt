@@ -1,2 +1,0 @@
-Acesta e un fisier text "err.txt"
-Acest fisier are un text scurt, si nesemnificativ

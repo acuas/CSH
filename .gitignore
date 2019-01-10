@@ -2,3 +2,11 @@ shell
 y.tab.c
 y.tab.h
 lexx.yy.c
+*.out
+err.*
+.idea
+.vscode
+.csh_history
+*.txt
+.fuse*
+*.json
