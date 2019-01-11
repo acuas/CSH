@@ -1,2 +1,0 @@
--rw-rw-r--. 1 pavel1289 pavel1289 10166 ian  9 16:41 command.c
--rwxrwxr-x. 1 pavel1289 pavel1289  1341 ian  9 14:38 command.h

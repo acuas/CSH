@@ -8,6 +8,8 @@
 #include <sys/syscall.h>
 #include <sys/stat.h>
 #include <fcntl.h>
+#include <signal.h>
+#include <setjmp.h>
 
 #include "command.h"
 
@@ -186,7 +188,15 @@ void execute() {
 
 void executeCommand(struct Command *command, struct CommandQueue * commandQueue) {
 
-	// Don't do anything if there are no simple commands
+	// Initialize the sigaction struct for signal handler
+
+	struct sigaction s;
+	s.sa_handler = sigHandler;
+	sigemptyset(&s.sa_mask);
+	s.sa_flags = SA_RESTART;
+	sigaction(SIGINT, &s, NULL);
+
+	// Don't do anything if there are no simple command
 
 	if (command->_numberOfSimpleCommands == 0) {
 		prompt();
@@ -207,14 +217,38 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 	}
 	else {
 		if (command->_inputMatchWord) {
-			printf("%s", command->_inputMatchWord);
+			char *firstStr = (char*)malloc(4096*sizeof(char));
+			char *lastStr = (char*)malloc(4096*sizeof(char));
+			int tmp = open("matchWord.txt", O_WRONLY | O_CREAT | O_TRUNC);
+			size_t size = 0;
+			int ok = 1;
+			while(ok){
+				write(1, "> ", strlen("> "));
+				getline(&lastStr, &size, stdin);
+				strcpy(firstStr, lastStr);
+				lastStr[strlen(lastStr)-1] = '\0';
+				if(strcmp(lastStr, command->_inputMatchWord) == 0){
+					
+					fdin = open("matchWord.txt", O_RDONLY);
+					ok = 0;
+				}else{
+					write(tmp, firstStr, strlen(firstStr));
+					
+				}
+				
+			}
+			close(tmp);
+			
+			
+		}else{
+			fdin = dup(tmpin);
 		}
 		// Use default input
-		fdin = dup(tmpin);
+		
 	}
 
 	pid_t pid;
-	int fdout, fderr, i;
+	int fdout, fderr, i, stat_loc;
 	for (i = 0; i < command->_numberOfSimpleCommands; i++) {
 		//redirect in out err
 		dup2(fdin, 0);
@@ -262,13 +296,21 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		close(fderr);
 
 		// Create child process
-
+		
 		pid = fork();
 		if (pid < 0) {
 			perror(NULL);
 			return;
 		}
 		else if(pid == 0) {
+
+			struct sigaction s_child;
+            s_child.sa_handler = sigHandler;
+            sigemptyset(&s_child.sa_mask);
+            s_child.sa_flags = SA_RESTART;
+            sigaction(SIGINT, &s_child, NULL);
+
+			
 			int j = 0;
 			char **argv = (char **)malloc((command->_simpleCommands[i]->_numberOfArguments + 1) * (sizeof(char*)));
 			// printf("Numarul de argumente este %d\n", _currentCommand->_simpleCommands[i]->_numberOfArguments);
@@ -293,8 +335,9 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			}
 		}
 		else {
-			wait(NULL);
-			printf("exit status %d\n", exitStatus);
+
+			if(!command->_background)
+				waitpid(pid, &stat_loc, WUNTRACED);
 		}
 	}
 
@@ -347,6 +390,12 @@ void prompt() {
 	getTheRightUser();
 	printf("%s@%s: ", userName, machineName);
 	fflush(stdout);
+}
+
+void sigHandler(int nr){
+	//signal(nr, SIG_IGN);
+	printf("\n");
+	prompt();
 }
 
 int yyparse(void);

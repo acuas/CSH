@@ -57,6 +57,7 @@ int logicAND, logicOR;
 int exitStatus;
 extern char *userName;
 extern char *machineName;
+void sigHandler(int );
 
 
 #endif
