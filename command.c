@@ -26,6 +26,7 @@ void getTheRightUser() {
 }
 
 struct SimpleCommand *newSimpleCommand() {
+	printf("newSimpleCommand()\n");
     struct SimpleCommand *_tmp = (struct SimpleCommand *) malloc(sizeof(struct SimpleCommand));
     _tmp->_numberOfAvailableArguments = 5;
     _tmp->_numberOfArguments = 0;
@@ -38,6 +39,7 @@ struct SimpleCommand *newSimpleCommand() {
 }
 
 void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
+	printf("insertingArguments...\n");
 	if (_tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments  + 1) {
 		// Double the available space
 		_tmp->_numberOfAvailableArguments *= 2;
@@ -104,13 +106,14 @@ void insertSimpleCommand(struct Command *_tmp, struct SimpleCommand * simpleComm
 }
 
 void clearCommandQueue() {
+	printf("clearCommandQ\n");
 	deleted = 0;
 	struct CommandQueue *tmp1, *tmp2;
 	tmp1 = _commandQueue;
 	tmp2 = tmp1;
 	while (tmp1 != NULL) {
 		tmp1 = tmp1->next;
-		//clearCommand(tmp2->command);
+		clearCommand(tmp2->command);
 		free(tmp2);
 		tmp2 = tmp1;
 	}
@@ -118,6 +121,8 @@ void clearCommandQueue() {
 }
 
 void clearCommand(struct Command *command) {
+	printf("clearCommand\n");
+
 	int i;
     for (i = 0; i < command->_numberOfAvailableSimpleCommands; ++i) {
         int j;
@@ -174,15 +179,19 @@ void history() {
 }
 
 void execute() {
+	printf("begin execute...");
 	struct CommandQueue *tmp = _commandQueue;
 	printCommandQueue();
 	while (tmp != NULL) {
+		
 		executeCommand(tmp->command, tmp);
 		if (tmp->logicAnd == 1 && tmp->succesExit == 0)
 			break;
 		tmp = tmp->next;
+		
 	}
 	clearCommandQueue();
+	printf("done clearing...\n");
 	prompt();
 }
 
@@ -196,6 +205,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 	s.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &s, NULL);
 
+	
 	// Don't do anything if there are no simple command
 
 	if (command->_numberOfSimpleCommands == 0) {
@@ -238,7 +248,8 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 				
 			}
 			close(tmp);
-			
+			free(lastStr);
+			free(firstStr);
 			
 		}else{
 			fdin = dup(tmpin);
@@ -295,22 +306,42 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		close(fdout);
 		close(fderr);
 
-		// Create child process
+	
+		if (strcmp(command->_simpleCommands[i]->_arguments[0], "cd") == 0) {
+			
+			if(chdir(command->_simpleCommands[i]->_arguments[1]) < 0){
+				perror(NULL);
+			}
+
+			dup2(tmpin, STDIN_FILENO);
+			dup2(tmpout, STDOUT_FILENO);
+			dup2(tmperr, STDERR_FILENO);
+			close(tmpin);
+			close(tmpout);
+			close(tmperr);
+
+			continue;
+				
+		}
+
+		printf("begining fork...\n");
 		
+		// Create child process
 		pid = fork();
+
 		if (pid < 0) {
 			perror(NULL);
 			return;
 		}
 		else if(pid == 0) {
-
-			struct sigaction s_child;
-            s_child.sa_handler = sigHandler;
-            sigemptyset(&s_child.sa_mask);
-            s_child.sa_flags = SA_RESTART;
-            sigaction(SIGINT, &s_child, NULL);
-
 			
+			struct sigaction s_child;
+			s_child.sa_handler = sigHandler;
+			sigemptyset(&s_child.sa_mask);
+			s_child.sa_flags = SA_RESTART;
+			sigaction(SIGINT, &s_child, NULL);
+			
+
 			int j = 0;
 			char **argv = (char **)malloc((command->_simpleCommands[i]->_numberOfArguments + 1) * (sizeof(char*)));
 			// printf("Numarul de argumente este %d\n", _currentCommand->_simpleCommands[i]->_numberOfArguments);
@@ -319,11 +350,9 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			}
 			// Add NULL argument at the end
 			argv[command->_simpleCommands[i]->_numberOfArguments] = NULL;
-			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[0]);
-			if (strcmp(command->_simpleCommands[i]->_arguments[0], "cd") == 0) {
-				chdir(argv[1]);
-			}
-			else if (strcmp(command->_simpleCommands[i]->_arguments[0], "history") == 0) {
+
+			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[1]);
+			if (strcmp(command->_simpleCommands[i]->_arguments[0], "history") == 0) {
 				history();
 			} 
 			else {
@@ -339,6 +368,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			if(!command->_background)
 				waitpid(pid, &stat_loc, WUNTRACED);
 		}
+		
 	}
 
 	// Restore in/out defaults
