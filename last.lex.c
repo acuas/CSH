@@ -21,6 +21,7 @@
 #include <errno.h>
 #include <stdlib.h>
 #include <ctype.h>
+#include <unistd.h>
 
 /* end standard C headers. */
 
@@ -570,9 +571,15 @@ static int input ( void );
 		buf[n] = '\0'; \
 		if ( c == EOF && ferror( yyin ) ) \
 			YY_FATAL_ERROR( "input in flex scanner failed" ); \
+		char *home = getenv("HOME"); \
+		char *fileName = "/.csh_history"; \
+		char *filePath = (char *) calloc(max_size, sizeof(char)); \
+		strcat(filePath, home); \
+		strcat(filePath, fileName); \
 		for (int i = 0; i < n; ++i) { \
 			if (buf[i] == '!' && buf[i + 1] == '!') { \
-				FILE * historyStream = fopen(".csh_history", "r"); \
+				FILE * historyStream = fopen(filePath, "a+"); \
+				fseek(historyStream, 0, SEEK_SET); \
 				if (historyStream == NULL) { \
 					YY_FATAL_ERROR("File for history doesn't exists yet!"); \
 				} \
@@ -614,7 +621,8 @@ static int input ( void );
 					commandN = commandN * 10 + (buf[j] - '0'); \
 					++j; \
 				} \
-				FILE * historyStream = fopen(".csh_history", "r"); \
+				FILE * historyStream = fopen(filePath, "a+"); \
+				fseek(historyStream, 0, SEEK_SET); \
 				if (historyStream == NULL) { \
 					YY_FATAL_ERROR("File for history doesn't exists yet!"); \
 				} \
@@ -655,7 +663,8 @@ static int input ( void );
 		}						\
 		bufReconstructed[strlen(bufReconstructed) - 1] = '\0'; \
 		FILE * historyStream; \
-		historyStream = fopen(".csh_history", "r+"); \
+		historyStream = fopen(filePath, "a+"); \
+		fseek(historyStream, 0, SEEK_SET); \
 		int historyStreamExist = 1; \
 		if (historyStream == NULL) { \
 			historyStreamExist = 0;	 \
@@ -672,7 +681,7 @@ static int input ( void );
 		fclose(historyStream); \
 		if (strcmp(lastCommand, bufReconstructed) != 0) { \
 			/* Write in file .csh_history the current command */ \
-			historyStream = fopen(".csh_history", "a"); \
+			historyStream = fopen(filePath, "a"); \
 			if (historyStream == NULL) \
 				YY_FATAL_ERROR( "error writing in .csh_history" ); \
 			if (strlen(bufReconstructed) > 0) { \
@@ -683,6 +692,7 @@ static int input ( void );
 		free(bufReconstructed); \
 		free(copyBuf); \
 		free(lastCommand); \
+		free(filePath); \
 		result = n; \
 		} \
 	else \

@@ -10,7 +10,8 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <setjmp.h>
-
+#include <limits.h>
+//#define PATH_MAX 300
 #include "command.h"
 
 #define noOfChars 50
@@ -163,7 +164,12 @@ void print(struct Command *_tmp) {
 }
 
 void history() {
-	FILE *historyStream = fopen(".csh_history", "r");
+	char *home = getenv("HOME"); 
+	char *fileName = "/.csh_history"; 
+	char *filePath = (char *) calloc(PATH_MAX, sizeof(char)); 
+	strcat(filePath, home); 
+	strcat(filePath, fileName); 
+	FILE *historyStream = fopen(filePath, "r");
 	if (historyStream == NULL) {
 		printf("The file .csh_history can't be opened!\n");
 		exit(EXIT_FAILURE);
@@ -261,6 +267,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 	pid_t pid;
 	int fdout, fderr, i, stat_loc;
 	for (i = 0; i < command->_numberOfSimpleCommands; i++) {
+		printf("%d ", i);
 		//redirect in out err
 		dup2(fdin, 0);
 		
@@ -308,9 +315,20 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 
 	
 		if (strcmp(command->_simpleCommands[i]->_arguments[0], "cd") == 0) {
-			
-			if(chdir(command->_simpleCommands[i]->_arguments[1]) < 0){
-				perror(NULL);
+			int retChdir;
+			if (strlen(command->_simpleCommands[i]->_arguments[1]) == 0) {
+				retChdir = chdir(getenv("HOME"));
+			}
+			else {
+				char *tok = command->_simpleCommands[i]->_arguments[1];
+				if (tok == "~" || tok == " " || tok == "") {
+					char *home = getenv("HOME");
+					retChdir = chdir(home);
+				}
+				else {
+					retChdir = chdir(tok);
+				}
+
 			}
 
 			dup2(tmpin, STDIN_FILENO);
@@ -350,8 +368,6 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 			}
 			// Add NULL argument at the end
 			argv[command->_simpleCommands[i]->_numberOfArguments] = NULL;
-
-			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[1]);
 			if (strcmp(command->_simpleCommands[i]->_arguments[0], "history") == 0) {
 				history();
 			} 
