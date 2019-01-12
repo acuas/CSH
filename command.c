@@ -202,7 +202,8 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		prompt();
 		return;
 	}
-	exitStatus = 0;
+	
+	int errOut = open(".intermediateErrOut", O_RDWR | O_CREAT | O_TRUNC);
 	// save IN/OUT/ERR
 
 	int tmpin = dup(STDIN_FILENO);
@@ -271,14 +272,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 					fdout = dup(tmpout);
 				}
 			}
-			
-			if (command->_errFile) {
-				fderr = open(command->_errFile, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
-			}
-			else {
-				fderr = dup(tmperr);
-			}
-			
+			fderr = errOut;
 		}
 		else {
 			// Not last simple command create pipe
@@ -327,9 +321,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 				history();
 			} 
 			else {
-				commandQueue->succesExit = 1;
 				exitStatus = execvp(command->_simpleCommands[i]->_arguments[0], argv);
-				commandQueue->succesExit = 0;
 				perror(NULL);
 				_exit(1);
 			}
@@ -340,7 +332,25 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 				waitpid(pid, &stat_loc, WUNTRACED);
 		}
 	}
-
+	
+	if (command->_errFile) {
+		fderr = open(command->_errFile, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+	}
+	else {
+		fderr = dup(tmperr);
+	}
+	
+	int errorOccured = 0;
+	char c;
+	while (read(errOut, &c, 1) != -1) {
+		errorOccured = 1;
+		write(fderr, &c, 1);
+	}
+	commandQueue->succesExit = 1;
+	if (errorOccured == 1)
+		commandQueue->succesExit = 0;
+	
+	remove(".intermediateErrOut");
 	// Restore in/out defaults
 
 	dup2(tmpin, STDIN_FILENO);

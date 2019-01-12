@@ -143,6 +143,90 @@ iomodifier_opt:
 		_currentCommand->_appendOutputFile = $4;
 		_currentCommand->_inputFile = $2;
 	}
+	| GREAT WORD ERR WORD {
+		_currentCommand->_outFile = $2;
+		_currentCommand->_errFile = $4;
+	}
+	| LESS WORD ERR WORD {
+		_currentCommand->_inputFile = $2;
+		_currentCommand->_errFile = $4;
+	}
+	| ERR WORD GREAT WORD {
+		_currentCommand->_outFile = $4;
+		_currentCommand->_errFile = $2;
+	}
+	| ERR WORD LESS WORD {
+		_currentCommand->_inputFile = $4;
+		_currentCommand->_errFile = $2;
+	}
+	| GREATGREAT WORD ERR WORD {
+		_currentCommand->_errFile = $4;
+		_currentCommand->_appendOutputFile = $2;
+	}
+	| ERR WORD GREATGREAT WORD {
+		_currentCommand->_errFile = $2;
+		_currentCommand->_appendOutputFile = $4;
+	}
+	| GREAT WORD LESS WORD ERR WORD {
+		_currentCommand->_inputFile = $4;
+		_currentCommand->_outFile = $2;
+		_currentCommand->_errFile = $6;
+	}
+	| GREAT WORD ERR WORD LESS WORD {
+		_currentCommand->_inputFile = $6;
+		_currentCommand->_outFile = $2;
+		_currentCommand->_errFile = $4;
+	}
+	| ERR WORD GREAT WORD LESS WORD {
+		_currentCommand->_inputFile = $6;
+		_currentCommand->_outFile = $4;
+		_currentCommand->_errFile = $2;
+	}
+	| ERR WORD LESS WORD GREAT WORD {
+		_currentCommand->_inputFile = $4;
+		_currentCommand->_outFile = $6;
+		_currentCommand->_errFile = $2;
+	}
+	| LESS WORD ERR WORD GREAT WORD {
+		_currentCommand->_inputFile = $2;
+		_currentCommand->_outFile = $6;
+		_currentCommand->_errFile = $4;
+	}
+	| LESS WORD GREAT WORD ERR WORD {
+		_currentCommand->_inputFile = $2;
+		_currentCommand->_outFile = $4;
+		_currentCommand->_errFile = $6;
+	}
+	| GREATGREAT WORD LESS WORD ERR WORD {
+		_currentCommand->_inputFile = $4;
+		_currentCommand->_errFile = $6;
+		_currentCommand->_appendOutputFile = $2;
+	}
+	| GREATGREAT WORD ERR WORD LESS WORD {
+		_currentCommand->_inputFile = $6;
+		_currentCommand->_errFile = $4;
+		_currentCommand->_appendOutputFile = $2;
+	}
+	| LESS WORD GREATGREAT WORD ERR WORD {
+		_currentCommand->_inputFile = $2;
+		_currentCommand->_errFile = $6;
+		_currentCommand->_appendOutputFile = $4;
+	}
+	| LESS WORD ERR WORD GREATGREAT WORD {
+		_currentCommand->_inputFile = $2;
+		_currentCommand->_errFile = $4;
+		_currentCommand->_appendOutputFile = $6;
+	}
+	| ERR WORD LESS WORD GREATGREAT WORD {
+		_currentCommand->_inputFile = $4;
+		_currentCommand->_errFile = $2;
+		_currentCommand->_appendOutputFile = $6;
+	}
+	| ERR WORD GREATGREAT WORD LESS WORD {
+		_currentCommand->_inputFile = $6;
+		_currentCommand->_errFile = $2;
+		_currentCommand->_appendOutputFile = $4;
+	}
 	|
 	;
 
