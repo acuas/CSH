@@ -11,7 +11,6 @@
 #include <signal.h>
 #include <setjmp.h>
 #include <limits.h>
-//#define PATH_MAX 300
 #include "command.h"
 
 #define noOfChars 50
@@ -265,9 +264,8 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 	}
 
 	pid_t pid;
-	int fdout, fderr, i, stat_loc;
+	int fdout, fderr, i, stat_loc, standardError = 0;
 	for (i = 0; i < command->_numberOfSimpleCommands; i++) {
-		printf("%d ", i);
 		//redirect in out err
 		dup2(fdin, 0);
 		
@@ -294,7 +292,8 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 				fderr = open(command->_errFile, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
 			}
 			else {
-				fderr = dup(tmperr);
+				fderr = open("err", O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+				standardError = 1;
 			}
 			
 		}
@@ -307,7 +306,6 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		}
 
 		// Redirect output
-
 		dup2(fdout, STDOUT_FILENO);
 		dup2(fderr, STDERR_FILENO);
 		close(fdout);
@@ -381,8 +379,33 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		}
 		else {
 
-			if(!command->_background)
+			if(!command->_background) {
 				waitpid(pid, &stat_loc, WUNTRACED);
+				// write to stderr
+				if (standardError == 1) {
+					FILE * fin = fopen("err", "r");
+					if (fin == NULL) {
+						printf("The file can't be opened!\n");
+					}
+					else {
+						char *line = NULL;
+						int entered = 0;
+           				size_t len = 0;
+           				ssize_t nread;
+						while ((nread = getline(&line, &len, fin)) != -1) {
+               				fwrite(line, nread, 1, stdout);
+							entered = 1;
+           				}
+						fclose(fin);
+						remove("err");
+						if (entered == 1) {
+							commandQueue->logicAnd = 1;
+							commandQueue->succesExit = 0;
+							break;	
+						}
+					}
+				}
+			}
 		}
 		
 	}
