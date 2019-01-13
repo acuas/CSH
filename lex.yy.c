@@ -458,7 +458,7 @@ char *yytext;
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include "y.tab.h"
+#include "shell.tab.h"
 
 #line 464 "lex.yy.c"
 

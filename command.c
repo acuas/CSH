@@ -26,18 +26,18 @@ void getTheRightUser() {
 }
 
 struct SimpleCommand *newSimpleCommand() {
-    struct SimpleCommand *_tmp = (struct SimpleCommand *) malloc(sizeof(struct SimpleCommand));
+    struct SimpleCommand *_tmp = (struct SimpleCommand *)malloc(sizeof(struct SimpleCommand));
     _tmp->_numberOfAvailableArguments = 5;
     _tmp->_numberOfArguments = 0;
     _tmp->_arguments = (char **)malloc(_tmp->_numberOfAvailableArguments * sizeof(char *));
     int i;
     for (i = 0; i < _tmp->_numberOfAvailableArguments; ++i) {
-        _tmp->_arguments[i] = (char *) calloc(noOfChars, sizeof(char));
+        _tmp->_arguments[i] = (char *)malloc(noOfChars * sizeof(char));
     }
     return _tmp;
 }
 
-void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
+void insertArgument(struct SimpleCommand *_tmp, char *argument) {
 	if (_tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments  + 1) {
 		// Double the available space
 		_tmp->_numberOfAvailableArguments *= 2;
@@ -48,7 +48,7 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
             _tmp->_arguments = _moreArguments;
             int i;
             for (i = _tmp->_numberOfAvailableArguments / 2; i < _tmp->_numberOfAvailableArguments; ++i) {
-                _tmp->_arguments[i] = (char *)calloc(noOfChars, sizeof(char));
+                _tmp->_arguments[i] = (char *)malloc(noOfChars * sizeof(char));
             }
         }
         else {
@@ -60,16 +60,15 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
 	}
 	strcpy(_tmp->_arguments[_tmp->_numberOfArguments], argument);
 	
-	_currentSimpleCommand->_numberOfArguments++;
+	_tmp->_numberOfArguments++;
 }
 
 struct Command *newCommand() {
     // Create available space for one simple command
-    struct Command *_tmp = (struct Command *) malloc(sizeof(struct Command));
+    struct Command *_tmp = (struct Command *)malloc(sizeof(struct Command));
     _tmp->_numberOfAvailableSimpleCommands = 5;
     _tmp->_numberOfSimpleCommands = 0;
-	_tmp->_simpleCommands = (struct SimpleCommand **)
-				malloc( _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand *));
+	_tmp->_simpleCommands = (struct SimpleCommand **)malloc( _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand *));
 	_tmp->_outFile = NULL;
 	_tmp->_inputFile = NULL;
 	_tmp->_errFile = NULL;
@@ -110,7 +109,7 @@ void clearCommandQueue() {
 	tmp2 = tmp1;
 	while (tmp1 != NULL) {
 		tmp1 = tmp1->next;
-		//clearCommand(tmp2->command);
+		clearCommand(tmp2->command);
 		free(tmp2);
 		tmp2 = tmp1;
 	}
@@ -123,7 +122,8 @@ void clearCommand(struct Command *command) {
         int j;
 		if (command->_simpleCommands[i] != NULL) {
 			for (j = 0; j < command->_simpleCommands[i]->_numberOfAvailableArguments; ++j) {
-				free(command->_simpleCommands[i]->_arguments[j]);
+				if (command->_simpleCommands[i]->_arguments[j])
+					free(command->_simpleCommands[i]->_arguments[j]);
 			}
 			free(command->_simpleCommands[i]->_arguments);
 			free(command->_simpleCommands[i]);
@@ -203,7 +203,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		return;
 	}
 	
-	int errOut = open(".intermediateErrOut", O_RDWR | O_CREAT | O_TRUNC);
+	//int errOut = open(".intermediateErrOut", O_RDWR | O_CREAT | O_TRUNC, S_IRWXU | S_IRGRP |  S_IROTH);
 	// save IN/OUT/ERR
 
 	int tmpin = dup(STDIN_FILENO);
@@ -272,7 +272,12 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 					fdout = dup(tmpout);
 				}
 			}
-			fderr = errOut;
+			if (command->_errFile) {
+				fderr = open(command->_errFile, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+			}
+			else {
+				fderr = dup(tmperr);
+			}
 		}
 		else {
 			// Not last simple command create pipe
@@ -340,9 +345,9 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		fderr = dup(tmperr);
 	}
 	
-	int errorOccured = 0;
+	/*int errorOccured = 0;
 	char c;
-	while (read(errOut, &c, 1) != -1) {
+	while (read(errOut, &c, 1) > 0) {
 		errorOccured = 1;
 		write(fderr, &c, 1);
 	}
@@ -350,7 +355,7 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 	if (errorOccured == 1)
 		commandQueue->succesExit = 0;
 	
-	remove(".intermediateErrOut");
+	remove(".intermediateErrOut");*/
 	// Restore in/out defaults
 
 	dup2(tmpin, STDIN_FILENO);
