@@ -59,5 +59,4 @@ extern char *userName;
 extern char *machineName;
 void sigHandler(int );
 
-
 #endif

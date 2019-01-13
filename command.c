@@ -10,7 +10,7 @@
 #include <fcntl.h>
 #include <signal.h>
 #include <setjmp.h>
-
+#include <limits.h>
 #include "command.h"
 
 #define noOfChars 50
@@ -26,22 +26,24 @@ void getTheRightUser() {
 }
 
 struct SimpleCommand *newSimpleCommand() {
-    struct SimpleCommand *_tmp = (struct SimpleCommand *) malloc(sizeof(struct SimpleCommand));
-    _tmp->_numberOfAvailableArguments = 5;
+    struct SimpleCommand *_tmp;
+	_tmp = (struct SimpleCommand *) malloc(sizeof(struct SimpleCommand));
+    _tmp->_numberOfAvailableArguments = 10;
     _tmp->_numberOfArguments = 0;
-    _tmp->_arguments = (char **)malloc(_tmp->_numberOfAvailableArguments * sizeof(char *));
-    int i;
+    _tmp->_arguments = (char **) malloc(_tmp->_numberOfAvailableArguments * sizeof(char *));
+	
+	int i;
     for (i = 0; i < _tmp->_numberOfAvailableArguments; ++i) {
         _tmp->_arguments[i] = (char *) calloc(noOfChars, sizeof(char));
     }
-    return _tmp;
+    
+	return _tmp;
 }
 
 void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
 	if (_tmp->_numberOfAvailableArguments == _tmp->_numberOfArguments  + 1) {
 		// Double the available space
 		_tmp->_numberOfAvailableArguments *= 2;
-
         char **_moreArguments = (char **)realloc(_tmp->_arguments, _tmp->_numberOfAvailableArguments * sizeof(char *));
         if (_moreArguments != NULL) {
             // Succes reallocating memory
@@ -58,18 +60,17 @@ void insertArgument(struct SimpleCommand *_tmp, char * argument ) {
             exit(1);
         }
 	}
+
 	strcpy(_tmp->_arguments[_tmp->_numberOfArguments], argument);
-	
 	_currentSimpleCommand->_numberOfArguments++;
 }
 
 struct Command *newCommand() {
     // Create available space for one simple command
     struct Command *_tmp = (struct Command *) malloc(sizeof(struct Command));
-    _tmp->_numberOfAvailableSimpleCommands = 5;
+    _tmp->_numberOfAvailableSimpleCommands = 10;
     _tmp->_numberOfSimpleCommands = 0;
-	_tmp->_simpleCommands = (struct SimpleCommand **)
-				malloc( _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand *));
+	_tmp->_simpleCommands = (struct SimpleCommand **) malloc( _tmp->_numberOfAvailableSimpleCommands * sizeof(struct SimpleCommand *));
 	_tmp->_outFile = NULL;
 	_tmp->_inputFile = NULL;
 	_tmp->_errFile = NULL;
@@ -111,7 +112,7 @@ void clearCommandQueue() {
 	while (tmp1 != NULL) {
 		tmp1 = tmp1->next;
 		//clearCommand(tmp2->command);
-		free(tmp2);
+		//free(tmp2);
 		tmp2 = tmp1;
 	}
 	_commandQueue = NULL;
@@ -158,7 +159,13 @@ void print(struct Command *_tmp) {
 }
 
 void history() {
-	FILE *historyStream = fopen(".csh_history", "r");
+	char *home = getenv("HOME"); 
+	char *fileName = "/.csh_history"; 
+	char *filePath = (char *) calloc(PATH_MAX, sizeof(char)); 
+	strcat(filePath, home); 
+	strcat(filePath, fileName); 
+	FILE *historyStream = fopen(filePath, "r");
+	
 	if (historyStream == NULL) {
 		printf("The file .csh_history can't be opened!\n");
 		exit(EXIT_FAILURE);
@@ -170,48 +177,48 @@ void history() {
 	while ((nread = getline(&line, &len, historyStream)) != -1) {
 		fwrite(line, nread, 1, stdout);
 	}
+
 	fclose(historyStream);
 }
 
 void execute() {
 	struct CommandQueue *tmp = _commandQueue;
-	printCommandQueue();
 	while (tmp != NULL) {
+		if (tmp->logicAnd == 1 && tmp->succesExit == 0)
+			break;
 		executeCommand(tmp->command, tmp);
 		if (tmp->logicAnd == 1 && tmp->succesExit == 0)
 			break;
 		tmp = tmp->next;
+		
 	}
 	clearCommandQueue();
 	prompt();
 }
 
 void executeCommand(struct Command *command, struct CommandQueue * commandQueue) {
-
 	// Initialize the sigaction struct for signal handler
-
 	struct sigaction s;
 	s.sa_handler = sigHandler;
 	sigemptyset(&s.sa_mask);
 	s.sa_flags = SA_RESTART;
 	sigaction(SIGINT, &s, NULL);
 
+	
 	// Don't do anything if there are no simple command
-
 	if (command->_numberOfSimpleCommands == 0) {
 		prompt();
 		return;
 	}
 	exitStatus = 0;
-	// save IN/OUT/ERR
 
+	// save IN/OUT/ERR
 	int tmpin = dup(STDIN_FILENO);
 	int tmpout = dup(STDOUT_FILENO);
 	int tmperr = dup(STDERR_FILENO);
 
 	// Set the initial Input
 	int fdin;
-	
 	if (command->_inputFile) {
 		fdin = open(command->_inputFile, O_RDONLY);
 	}
@@ -238,21 +245,20 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 				
 			}
 			close(tmp);
-			
+			free(lastStr);
+			free(firstStr);
 			
 		}else{
 			fdin = dup(tmpin);
 		}
-		// Use default input
-		
+		// Use default input	
 	}
 
 	pid_t pid;
-	int fdout, fderr, i, stat_loc;
+	int fdout, fderr, i, stat_loc, standardError = 0;
 	for (i = 0; i < command->_numberOfSimpleCommands; i++) {
 		//redirect in out err
 		dup2(fdin, 0);
-		
 		close(fdin);
 
 		//setup output
@@ -276,7 +282,8 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 				fderr = open(command->_errFile, O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
 			}
 			else {
-				fderr = dup(tmperr);
+				fderr = open("err", O_WRONLY | O_CREAT,  S_IRUSR | S_IWUSR | S_IRGRP |  S_IROTH);
+				standardError = 1;
 			}
 			
 		}
@@ -289,58 +296,108 @@ void executeCommand(struct Command *command, struct CommandQueue * commandQueue)
 		}
 
 		// Redirect output
-
 		dup2(fdout, STDOUT_FILENO);
 		dup2(fderr, STDERR_FILENO);
 		close(fdout);
 		close(fderr);
 
-		// Create child process
+		if (strcmp(command->_simpleCommands[i]->_arguments[0], "cd") == 0) {
+			int retChdir;
+			if (strlen(command->_simpleCommands[i]->_arguments[1]) == 0) {
+				retChdir = chdir(getenv("HOME"));
+			}
+			else {
+				char *tok = command->_simpleCommands[i]->_arguments[1];
+				if (tok == "~" || tok == " " || tok == "") {
+					char *home = getenv("HOME");
+					retChdir = chdir(home);
+				}
+				else {
+					retChdir = chdir(tok);
+				}
+
+			}
+
+			dup2(tmpin, STDIN_FILENO);
+			dup2(tmpout, STDOUT_FILENO);
+			dup2(tmperr, STDERR_FILENO);
+			close(tmpin);
+			close(tmpout);
+			close(tmperr);
+
+			continue;
+				
+		}
 		
+		// Create child process
 		pid = fork();
+
 		if (pid < 0) {
 			perror(NULL);
 			return;
 		}
 		else if(pid == 0) {
-
 			struct sigaction s_child;
-            s_child.sa_handler = sigHandler;
-            sigemptyset(&s_child.sa_mask);
-            s_child.sa_flags = SA_RESTART;
-            sigaction(SIGINT, &s_child, NULL);
-
+			s_child.sa_handler = sigHandler;
+			sigemptyset(&s_child.sa_mask);
+			s_child.sa_flags = SA_RESTART;
+			sigaction(SIGINT, &s_child, NULL);
 			
 			int j = 0;
 			char **argv = (char **)malloc((command->_simpleCommands[i]->_numberOfArguments + 1) * (sizeof(char*)));
-			// printf("Numarul de argumente este %d\n", _currentCommand->_simpleCommands[i]->_numberOfArguments);
 			for (j = 0; j < command->_simpleCommands[i]->_numberOfArguments; j++) {
 				argv[j] =  command->_simpleCommands[i]->_arguments[j];
 			}
 			// Add NULL argument at the end
 			argv[command->_simpleCommands[i]->_numberOfArguments] = NULL;
-			//printf("%s\n", _currentCommand->_simpleCommands[i]->_arguments[0]);
-			if (strcmp(command->_simpleCommands[i]->_arguments[0], "cd") == 0) {
-				chdir(argv[1]);
-			}
-			else if (strcmp(command->_simpleCommands[i]->_arguments[0], "history") == 0) {
+			if (strcmp(command->_simpleCommands[i]->_arguments[0], "history") == 0) {
 				history();
 			} 
 			else {
-				commandQueue->succesExit = 1;
 				exitStatus = execvp(command->_simpleCommands[i]->_arguments[0], argv);
-				commandQueue->succesExit = 0;
 				perror(NULL);
 				_exit(1);
 			}
 		}
 		else {
 
-			if(!command->_background)
+			if(!command->_background) {
 				waitpid(pid, &stat_loc, WUNTRACED);
+				// write to stderr
+				if (standardError == 1) {
+					FILE * fin = fopen("err", "r");
+					if (fin == NULL) {
+						printf("The file can't be opened!\n");
+					}
+					else {
+						char *line = NULL;
+						int entered = 0;
+           				size_t len = 0;
+           				ssize_t nread;
+						while ((nread = getline(&line, &len, fin)) != -1) {
+               				fwrite(line, nread, 1, stdout);
+							entered = 1;
+           				}
+
+						fclose(fin);
+						remove("err");
+						
+						if (entered == 1) {
+							if(commandQueue->logicAnd == 1){
+								commandQueue->succesExit = 0;
+							    break;
+							}
+								
+						}
+						else {
+							commandQueue->succesExit = 1;
+						}
+					}
+				}
+			}
 		}
 	}
-
+	
 	// Restore in/out defaults
 
 	dup2(tmpin, STDIN_FILENO);
@@ -393,7 +450,6 @@ void prompt() {
 }
 
 void sigHandler(int nr){
-	//signal(nr, SIG_IGN);
 	printf("\n");
 	prompt();
 }
