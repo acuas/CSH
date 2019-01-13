@@ -1,6 +1,6 @@
 %token	<string_val> WORD
 
-%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS LOGIC_AND LOGIC_OR
+%token 	NOTOKEN GREAT LESS ERR NEWLINE PIPE GREATGREAT LESSLESS LOGIC_AND LOGIC_OR BACKGROUND
 
 %union	{
 	char *string_val;
@@ -84,6 +84,9 @@ arg_list:
 argument:
 	WORD {
 		insertArgument(_currentSimpleCommand, $1);
+	} 
+	| BACKGROUND {
+		_currentCommand->_background = 1;
 	}
 	;
 
