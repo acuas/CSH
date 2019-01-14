@@ -56,9 +56,9 @@ handles the signals caught by ```CTRL + C``` the way that it will not reset a pr
 * Popescu Nicolae-Aurelian
 
 ## TODO
-- [ ]  commands running in background
+- [X]  commands running in background
 - [ ]  handle CTRL+Z signals
-- [ ]  working with more than 5 commands 
+- [X]  working with more than 5 commands 
 - [ ]  Bash Scripts :muscle:
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
